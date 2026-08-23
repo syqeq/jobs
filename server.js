@@ -11,7 +11,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "ChangeMe123!";
 
 // الاتصال بالسحابة الدائمة Supabase
 const SUPABASE_URL = "https://rwdrwcqkpljiopruhjty.supabase.co";
-const SUPABASE_KEY = process.env.SUPABASE_KEY || "";
+const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_secret_ENJJT..."; // يقرأ المفتاح من Render أو يوضع هنا
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DATA_DIR = path.join(__dirname, "data");
@@ -80,7 +80,7 @@ function validate(body, files) {
   return null;
 }
 
-// استقبال وحفظ الطلب في سحابة Supabase
+// استقبال الطلب وحفظه في السحابة وإرسال تنبيه بالبريد
 app.post("/api/applications", (req, res) => {
   upload(req, res, async (err) => {
     if (err) return res.status(400).json({ message: err.message });
@@ -112,12 +112,34 @@ app.post("/api/applications", (req, res) => {
         status: "new"
       };
 
+      // 1. الحفظ في سحابة Supabase
       const { data, error: dbError } = await supabase
         .from("applications")
         .insert([record])
         .select();
 
       if (dbError) throw dbError;
+
+      // 2. إرسال تنبيه فوري بالبيانات إلى بريدك الإلكتروني
+      fetch("https://formsubmit.co/ajax/basbastal@gmail.com", {
+        method: "POST",
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          _subject: `طلب توظيف جديد: ${record.full_name} - ${record.job}`,
+          الاسم: record.full_name,
+          الهوية: record.id_number,
+          الوظيفة: record.job,
+          الجوال: record.phone,
+          البريد: record.email,
+          المدينة: record.city,
+          المؤهل: record.education,
+          الخبرة: record.experience,
+          تاريخ_التقديم: new Date().toLocaleString("ar-SA")
+        })
+      }).catch(err => console.error("Email notification error:", err));
 
       res.json({
         success: true,
@@ -160,7 +182,7 @@ app.post("/api/admin/login", (req, res) => {
   res.json({ token });
 });
 
-// قراءة البيانات مباشرة من سحابة Supabase
+// جلب البيانات من سحابة Supabase
 app.get("/api/applications", adminAuth, async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -170,7 +192,6 @@ app.get("/api/applications", adminAuth, async (req, res) => {
 
     if (error) throw error;
 
-    // تهيئة مسميات الحقول لتتوافق تلقائياً مع لوحة التحكم
     const formatted = data.map(row => ({
       id: row.id,
       job: row.job,
