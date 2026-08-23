@@ -6,29 +6,36 @@
   <title>لوحة إدارة الطلبات</title>
   <style>
     *{box-sizing:border-box}
-    body{margin:0;background:#f5f7f6;color:#333;font-family:Tahoma,Arial,sans-serif}
-    .wrap{max-width:1200px;margin:25px auto;padding:0 15px}
-    .top{background:#fff;border-radius:12px;padding:20px;box-shadow:0 3px 15px rgba(0,0,0,.07);margin-bottom:15px}
-    h1{margin:0 0 8px;font-size:22px}
-    .sub{color:#777;font-size:12px}
+    body{margin:0;background:#062b26;color:#333;font-family:Tahoma,Arial,sans-serif;min-height:100vh;padding:20px 0}
+    .wrap{max-width:1300px;margin:0 auto;padding:0 15px}
+    .top{background:#fff;border-radius:12px;padding:22px;box-shadow:0 4px 20px rgba(0,0,0,.15);margin-bottom:15px}
+    h1{margin:0 0 8px;font-size:22px;color:#0c594f}
+    .sub{color:#666;font-size:13px}
     .stats{display:flex;gap:12px;margin-top:15px;flex-wrap:wrap}
-    .stat{background:#eef5f1;border-radius:9px;padding:12px 18px;min-width:150px}
-    .stat strong{display:block;font-size:22px;color:#416d5d}
-    .stat span{font-size:11px;color:#666}
-    .table-box{background:#fff;border-radius:12px;overflow:auto;box-shadow:0 3px 15px rgba(0,0,0,.07)}
-    table{width:100%;border-collapse:collapse;min-width:900px}
-    th,td{padding:12px 10px;border-bottom:1px solid #eee;text-align:right;font-size:12px;vertical-align:top}
-    th{background:#f8faf9;font-weight:700}
-    .badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#eaf5ef;color:#3d6d59;font-size:10px}
-    .actions a,.actions button{display:inline-block;margin:2px;padding:6px 9px;border:1px solid #d7ddd9;border-radius:6px;background:#fff;color:#416d5d;text-decoration:none;font-family:inherit;font-size:10px;cursor:pointer}
-    .actions a:hover{background:#eef5f1}
-    .danger{color:#a83d3d!important}
-    .empty{padding:35px;text-align:center;color:#888}
-    .login{max-width:420px;margin:80px auto;background:#fff;padding:25px;border-radius:12px;box-shadow:0 3px 15px rgba(0,0,0,.08)}
-    input{width:100%;height:40px;margin:7px 0 12px;padding:0 10px;border:1px solid #ddd;border-radius:7px;font-family:inherit}
-    button.main{width:100%;height:42px;border:0;border-radius:8px;background:#4f7f6d;color:#fff;font-family:inherit;cursor:pointer}
-    .error{color:#a83d3d;font-size:11px}
-    @media(max-width:700px){.wrap{margin:10px auto}.top{padding:15px}}
+    .stat{background:#eef6f4;border-radius:9px;padding:12px 18px;min-width:150px;border:1px solid #d4e7e2}
+    .stat strong{display:block;font-size:22px;color:#0c594f}
+    .stat span{font-size:12px;color:#555}
+    
+    /* أدوات التصفية والتصدير */
+    .toolbar{background:#fff;border-radius:12px;padding:15px 20px;margin-bottom:15px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+    .filters{display:flex;gap:10px;flex-wrap:wrap;flex:1}
+    .filters input, .filters select{height:38px;padding:0 10px;border:1px solid #cbd5e1;border-radius:6px;font-family:inherit;font-size:12px;outline:none}
+    .filters input{min-width:200px}
+    .btn-export{height:38px;padding:0 16px;background:#0c594f;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:12px;font-weight:bold;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background 0.2s}
+    .btn-export:hover{background:#073d36}
+
+    .table-box{background:#fff;border-radius:12px;overflow:auto;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+    table{width:100%;border-collapse:collapse;min-width:1000px}
+    th,td{padding:12px 10px;border-bottom:1px solid #eee;text-align:right;font-size:12px;vertical-align:middle}
+    th{background:#f8faf9;font-weight:700;color:#0c594f}
+    .actions a,.actions button{display:inline-block;margin:2px;padding:6px 10px;border:1px solid #cfdbd9;border-radius:6px;background:#fff;color:#0c594f;text-decoration:none;font-family:inherit;font-size:11px;font-weight:bold;cursor:pointer}
+    .actions a:hover{background:#eef6f4}
+    .danger{color:#a83d3d!important;border-color:#fca5a5!important}
+    .empty{padding:40px;text-align:center;color:#888}
+    .login{max-width:400px;margin:100px auto;background:#fff;padding:30px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+    input.log-input{width:100%;height:42px;margin:10px 0 15px;padding:0 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit}
+    button.main{width:100%;height:44px;border:0;border-radius:8px;background:#0c594f;color:#fff;font-family:inherit;font-weight:bold;cursor:pointer}
+    .error{color:#a83d3d;font-size:12px;margin-bottom:10px}
   </style>
 </head>
 <body>
@@ -36,15 +43,16 @@
 <script>
 const app = document.getElementById("app");
 let token = localStorage.getItem("adminToken");
+let allData = [];
 
 function loginPage(error="") {
   app.innerHTML = `
     <div class="login">
-      <h2>لوحة إدارة الطلبات</h2>
-      <p class="sub">سجّل الدخول لمشاهدة الطلبات والمرفقات.</p>
+      <h2 style="color:#0c594f;margin:0 0 10px">لوحة إدارة الطلبات</h2>
+      <p class="sub">سجّل الدخول لمشاهدة الطلبات وتصدير ملف Excel.</p>
       ${error ? `<p class="error">${error}</p>` : ""}
-      <label>كلمة المرور</label>
-      <input id="password" type="password" placeholder="كلمة مرور الإدارة">
+      <label style="font-size:13px;font-weight:bold">كلمة المرور</label>
+      <input id="password" class="log-input" type="password" placeholder="كلمة مرور الإدارة">
       <button class="main" onclick="login()">دخول</button>
     </div>`;
   document.getElementById("password").addEventListener("keydown", e => {
@@ -76,36 +84,69 @@ async function dashboard() {
     return loginPage("انتهت الجلسة.");
   }
   const data = await r.json();
-  renderDashboard(data.applications || []);
+  allData = data.applications || [];
+  renderDashboard();
 }
 
-function renderDashboard(applications) {
+function renderDashboard() {
+  const q = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
+  const jobFilter = document.getElementById("jobFilter")?.value || "";
+  const cityFilter = document.getElementById("cityFilter")?.value || "";
+
+  let filtered = allData.filter(x => {
+    const matchQ = !q || (x.fullName && x.fullName.toLowerCase().includes(q)) || (x.idNumber && x.idNumber.includes(q)) || (x.phone && x.phone.includes(q));
+    const matchJob = !jobFilter || x.job === jobFilter;
+    const matchCity = !cityFilter || x.city === cityFilter;
+    return matchQ && matchJob && matchCity;
+  });
+
+  const uniqueJobs = [...new Set(allData.map(x => x.job).filter(Boolean))];
+  const uniqueCities = [...new Set(allData.map(x => x.city).filter(Boolean))];
+
   app.innerHTML = `
     <div class="wrap">
       <div class="top">
         <h1>لوحة إدارة طلبات التوظيف</h1>
-        <div class="sub">عرض الطلبات والمرفقات المحفوظة في قاعدة البيانات.</div>
+        <div class="sub">متابعة المتقدمين، تصفية المسارات، وتصدير قاعدة البيانات بصيغة Excel.</div>
         <div class="stats">
-          <div class="stat"><strong>${applications.length}</strong><span>إجمالي الطلبات</span></div>
-          <div class="stat"><strong>${applications.filter(x => x.status === "new").length}</strong><span>طلبات جديدة</span></div>
+          <div class="stat"><strong>${allData.length}</strong><span>إجمالي الطلبات</span></div>
+          <div class="stat"><strong>${filtered.length}</strong><span>النتائج المعروضة</span></div>
         </div>
       </div>
+
+      <div class="toolbar">
+        <div class="filters">
+          <input type="text" id="searchInput" placeholder="بحث بالاسم، الهوية، أو الجوال..." value="${escapeHtml(q)}" oninput="renderDashboard()">
+          <select id="jobFilter" onchange="renderDashboard()">
+            <option value="">-- تصفية حسب الوظيفة --</option>
+            ${uniqueJobs.map(j => `<option value="${escapeHtml(j)}" ${jobFilter===j?'selected':''}>${escapeHtml(j)}</option>`).join("")}
+          </select>
+          <select id="cityFilter" onchange="renderDashboard()">
+            <option value="">-- تصفية حسب المدينة --</option>
+            ${uniqueCities.map(c => `<option value="${escapeHtml(c)}" ${cityFilter===c?'selected':''}>${escapeHtml(c)}</option>`).join("")}
+          </select>
+        </div>
+        <button class="btn-export" onclick="exportToExcel()">
+          📥 تصدير إلى Excel (CSV)
+        </button>
+      </div>
+
       <div class="table-box">
-        ${applications.length ? `
+        ${filtered.length ? `
         <table>
           <thead><tr>
-            <th>رقم</th><th>الاسم</th><th>الوظيفة</th><th>الجوال</th><th>المدينة</th>
+            <th>رقم</th><th>الاسم والهوية</th><th>الوظيفة</th><th>الجوال</th><th>المدينة</th>
             <th>المؤهل</th><th>الخبرة</th><th>التاريخ</th><th>المرفقات</th><th>إجراء</th>
           </tr></thead>
           <tbody>
-          ${applications.map(x => `
+          ${filtered.map(x => `
             <tr>
               <td>#${x.id}</td>
-              <td>${escapeHtml(x.fullName)}<br><small>${escapeHtml(x.email)}</small></td>
-              <td>${escapeHtml(x.job)}</td>
-              <td>${escapeHtml(x.phone)}</td>
+              <td><strong>${escapeHtml(x.fullName)}</strong><br><small style="color:#666">الهوية: ${escapeHtml(x.idNumber || "—")}</small></td>
+              <td><strong>${escapeHtml(x.job)}</strong></td>
+              <td><a href="tel:${escapeHtml(x.phone)}" style="color:#0c594f;text-decoration:none">${escapeHtml(x.phone)}</a></td>
               <td>${escapeHtml(x.city)}</td>
-              <td>${escapeHtml(x.education)}<br>${escapeHtml(x.major || "بدون تخصص")}</td>
+              <td>${escapeHtml(x.education)}<br><small style="color:#777">${escapeHtml(x.major || "بدون تخصص")}</small></td>
               <td>${escapeHtml(String(x.experience || 0))} سنة</td>
               <td>${new Date(x.createdAt).toLocaleString("ar-SA")}</td>
               <td class="actions">
@@ -117,7 +158,7 @@ function renderDashboard(applications) {
               <td class="actions"><button class="danger" onclick="removeApp(${x.id})">حذف</button></td>
             </tr>`).join("")}
           </tbody>
-        </table>` : `<div class="empty">لا توجد طلبات حتى الآن.</div>`}
+        </table>` : `<div class="empty">لا توجد نتائج مطابقة للتصفية.</div>`}
       </div>
     </div>`;
 }
@@ -126,6 +167,39 @@ function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
   }[c]));
+}
+
+function exportToExcel() {
+  if (!allData.length) return alert("لا توجد بيانات لتصديرها.");
+
+  const headers = ["رقم الطلب", "الاسم الرباعي", "رقم الهوية", "الوظيفة", "الجوال", "البريد الإلكتروني", "المدينة", "الجنسية", "الجنس", "المؤهل", "التخصص", "سنوات الخبرة", "اللغات", "تاريخ التقديم"];
+  
+  const rows = allData.map(x => [
+    x.id,
+    `"${(x.fullName || "").replace(/"/g, '""')}"`,
+    `"${x.idNumber || ""}"`,
+    `"${(x.job || "").replace(/"/g, '""')}"`,
+    `"${x.phone || ""}"`,
+    `"${(x.email || "").replace(/"/g, '""')}"`,
+    `"${(x.city || "").replace(/"/g, '""')}"`,
+    `"${(x.nationality || "").replace(/"/g, '""')}"`,
+    `"${(x.gender || "").replace(/"/g, '""')}"`,
+    `"${(x.education || "").replace(/"/g, '""')}"`,
+    `"${(x.major || "").replace(/"/g, '""')}"`,
+    x.experience || 0,
+    `"${(x.languages || "").replace(/"/g, '""')}"`,
+    `"${new Date(x.createdAt).toLocaleString("ar-SA")}"`
+  ]);
+
+  const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `طلبات_التوظيف_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 async function removeApp(id) {
