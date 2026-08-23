@@ -279,7 +279,6 @@
 <body>
   <div class="container">
     <header class="header">
-      <!-- الشعار عبر الرابط السحابي المباشر الموثوق -->
       <img src="https://i.ibb.co/S7DMyp4Q/WhatsApp-Image-2026-08-23-at-9-48-59-PM-3.jpg" alt="شعار مجموعة سييرا ومواسم" class="header-logo" />
       <h1>بوابة التوظيف الموحدة</h1>
       <p>مواسم - إحدى شركات مجموعة سييرا (المسافر)</p>
@@ -359,7 +358,7 @@
           </div>
         </div>
 
-        <!-- بيانات التواصل والإقامة -->
+        <!-- بيانات التواصل ومكان الإقامة -->
         <div class="form-section">
           <h2>3. التواصل ومكان الإقامة</h2>
           <div class="grid-3">
@@ -374,8 +373,20 @@
             </div>
 
             <div class="input-group">
-              <label for="city">مدينة الإقامة الحالية <span class="req">*</span></label>
-              <input type="text" id="city" name="city" placeholder="مثال: مكة المكرمة، جدة، الرياض" required />
+              <label for="city">مدينة الإقامة <span class="req">*</span></label>
+              <select id="city" name="city" required>
+                <option value="" disabled selected>-- اختر --</option>
+                <option value="الرياض">الرياض</option>
+                <option value="جدة">جدة</option>
+                <option value="مكة المكرمة">مكة المكرمة</option>
+                <option value="المدينة المنورة">المدينة المنورة</option>
+                <option value="الدمام">الدمام</option>
+                <option value="الخبر">الخبر</option>
+                <option value="أبها">أبها</option>
+                <option value="تبوك">تبوك</option>
+                <option value="القصيم">القصيم</option>
+                <option value="أخرى">أخرى</option>
+              </select>
             </div>
           </div>
         </div>
