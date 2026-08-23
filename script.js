@@ -1,99 +1,76 @@
-const form = document.getElementById("applicationForm");
-const message = document.getElementById("message");
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("applicationForm");
+  const msgBox = document.getElementById("message");
+  const submitBtn = form.querySelector('button[type="submit"]');
 
-const fileInputs = [
-  ["idFile", "idFileName"],
-  ["cvFile", "cvFileName"],
-  ["qualificationFile", "qualificationFileName"],
-  ["experienceFile", "experienceFileName"]
-];
-
-const MAX_SIZE = 2 * 1024 * 1024;
-const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
-
-fileInputs.forEach(([inputId, nameId]) => {
-  const input = document.getElementById(inputId);
-  const name = document.getElementById(nameId);
-
-  input.addEventListener("change", () => {
-    if (!input.files.length) {
-      name.textContent = "لم يتم اختيار أي ملف";
-      return;
+  // معالجة أسماء الملفات عند الاختيار
+  const fileInputs = ["idFile", "cvFile", "qualificationFile", "experienceFile"];
+  fileInputs.forEach(id => {
+    const input = document.getElementById(id);
+    const labelSpan = document.getElementById(id + "Name");
+    if (input && labelSpan) {
+      input.addEventListener("change", () => {
+        labelSpan.textContent = input.files?.[0]?.name || "لم يتم اختيار أي ملف";
+      });
     }
-
-    const file = input.files[0];
-
-    if (!allowedTypes.includes(file.type)) {
-      input.value = "";
-      name.textContent = "لم يتم اختيار أي ملف";
-      showMessage("الرجاء رفع ملف بصيغة PDF أو JPG أو PNG.", "error");
-      return;
-    }
-
-    if (file.size > MAX_SIZE) {
-      input.value = "";
-      name.textContent = "لم يتم اختيار أي ملف";
-      showMessage("حجم الملف يجب ألا يتجاوز 2 ميجا.", "error");
-      return;
-    }
-
-    name.textContent = file.name;
-    hideMessage();
   });
-});
 
-function showMessage(text, type) {
-  message.textContent = text;
-  message.className = `message ${type}`;
-}
-
-function hideMessage() {
-  message.textContent = "";
-  message.className = "message";
-}
-
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  hideMessage();
-
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    showMessage("تم استلام طلبك بنجاح، وستتم مراجعته والتواصل معك.", "success");
-    return;
+  function showMessage(text, type = "error") {
+    msgBox.textContent = text;
+    msgBox.className = `message ${type}`;
+    msgBox.style.display = "block";
+    msgBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
-  const submitButton = form.querySelector(".submit-button");
-  const originalText = submitButton.innerHTML;
-  submitButton.disabled = true;
-  submitButton.innerHTML = "جاري الإرسال...";
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msgBox.style.display = "none";
 
-  const data = new FormData(form);
-
-  try {
-    const response = await fetch("/api/applications", {
-      method: "POST",
-      body: data
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.message || "تعذر إرسال الطلب.");
+    const idNumber = form.idNumber.value.trim();
+    if (!/^\d{10}$/.test(idNumber)) {
+      return showMessage("رقم الهوية / الإقامة يجب أن يتكون من 10 أرقام.");
     }
 
-    showMessage(
-      `تم إرسال الطلب بنجاح. رقم الطلب: ${result.applicationId}`,
-      "success"
-    );
+    const phone = form.phone.value.trim();
+    if (!/^05\d{8}$/.test(phone)) {
+      return showMessage("رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام.");
+    }
 
-    form.reset();
-    fileInputs.forEach(([, nameId]) => {
-      document.getElementById(nameId).textContent = "لم يتم اختيار أي ملف";
-    });
-  } catch (error) {
-    showMessage(error.message || "حدث خطأ أثناء إرسال الطلب.", "error");
-  } finally {
-    submitButton.disabled = false;
-    submitButton.innerHTML = originalText;
-  }
+    if (!document.getElementById("agreement").checked) {
+      return showMessage("يجب الموافقة على الإقرار والشروط قبل الإرسال.");
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span>جاري الإرسال...</span>`;
+
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch("/api/applications", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "حدث خطأ أثناء إرسال الطلب.");
+      }
+
+      // الرسالة الرسمية المحمية دون إظهار أي معرفات
+      showMessage("تم استلام طلبك بنجاح، وستتم مراجعته والتواصل معك.", "success");
+      form.reset();
+
+      fileInputs.forEach(id => {
+        const labelSpan = document.getElementById(id + "Name");
+        if (labelSpan) labelSpan.textContent = "لم يتم اختيار أي ملف";
+      });
+
+    } catch (err) {
+      showMessage(err.message || "تعذر الاتصال بالسيرفر. يرجى المحاولة لاحقاً.");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>إرسال الطلب</span><span class="send-icon">➤</span>`;
+    }
+  });
 });
