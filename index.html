@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>بوابة التوظيف الموحدة | المسافر</title>
+  <title>بوابة التوظيف الموحدة | مواسم - سييرا</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
@@ -54,23 +54,31 @@
     }
 
     .header {
-      background: linear-gradient(135deg, var(--primary) 0%, #084039 100%);
-      color: #fff;
-      padding: 35px 30px;
+      background: #ffffff;
+      padding: 30px 30px 20px;
       text-align: center;
+      border-bottom: 3px solid var(--primary);
+    }
+
+    .header-logo {
+      max-width: 220px;
+      height: auto;
+      margin-bottom: 15px;
+      display: inline-block;
     }
 
     .header h1 {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
+      color: var(--primary);
       margin-bottom: 8px;
       letter-spacing: -0.5px;
     }
 
     .header p {
       font-size: 15px;
-      color: #e2e8f0;
-      font-weight: 400;
+      color: var(--text-muted);
+      font-weight: 500;
     }
 
     .form-wrapper {
@@ -269,10 +277,10 @@
 <body>
   <div class="container">
     <header class="header">
-      <div class="logo-area">
-        <h1>بوابة التوظيف الموحدة</h1>
-        <p>انضم إلى فريق العمل المتميز وشاركنا مسيرة النجاح</p>
-      </div>
+      <!-- صورة شعار سييرا ومواسم -->
+      <img src="./logo.png" alt="شعار مجموعة سييرا ومواسم" class="header-logo" />
+      <h1>بوابة التوظيف الموحدة</h1>
+      <p>مواسم - إحدى شركات مجموعة سييرا (المسافر)</p>
     </header>
 
     <main class="form-wrapper">
@@ -283,15 +291,18 @@
         <div class="form-section">
           <h2>1. المسار الوظيفي</h2>
           <div class="input-group">
-            <label for="job">الوظيفة المطلوبة <span class="req">*</span></label>
+            <label for="job">المسار المطلوب <span class="req">*</span></label>
             <select id="job" name="job" required>
-              <option value="" disabled selected>اختر الوظيفة المتقدم إليها...</option>
-              <option value="خدمة عملاء">خدمة عملاء (Customer Service)</option>
-              <option value="مبيعات سياحية">مبيعات وتذاكر (Travel Consultant)</option>
-              <option value="تقنية معلومات وأمن سيبراني">تقنية معلومات وأمن سيبراني (IT & Cybersecurity)</option>
-              <option value="محاسبة ومالية">محاسبة وإدارة مالية (Accounting & Finance)</option>
-              <option value="تسويق رقمي">تسويق رقمي وصناعة محتوى (Digital Marketing)</option>
-              <option value="إدارة عمليات وموارد بشرية">موارد بشرية وعمليات (HR & Operations)</option>
+              <option value="" disabled selected>اختر المسار المتقدم إليه...</option>
+              <option value="مسار الأمن والسلامة">مسار الأمن والسلامة</option>
+              <option value="مسار الإسكان والإيواء">مسار الإسكان والإيواء</option>
+              <option value="مسار الإعاشة">مسار الإعاشة</option>
+              <option value="مسار التجهيز والاستعداد المسبق">مسار التجهيز والاستعداد المسبق</option>
+              <option value="مسار التفويج">مسار التفويج</option>
+              <option value="مسار القادة">مسار القادة</option>
+              <option value="مسار النقل">مسار النقل</option>
+              <option value="مسار خدمات المشاعر">مسار خدمات المشاعر</option>
+              <option value="مسار خدمة العملاء">مسار خدمة العملاء</option>
             </select>
           </div>
         </div>
@@ -328,7 +339,20 @@
 
             <div class="input-group">
               <label for="nationality">الجنسية <span class="req">*</span></label>
-              <input type="text" id="nationality" name="nationality" placeholder="مثال: سعودي" required />
+              <select id="nationality" name="nationality" required>
+                <option value="" disabled selected>اختر الجنسية...</option>
+                <option value="سعودي">سعودي</option>
+                <option value="مصري">مصري</option>
+                <option value="سوداني">سوداني</option>
+                <option value="يمني">يمني</option>
+                <option value="أردني">أردني</option>
+                <option value="سوري">سوري</option>
+                <option value="باكستاني">باكستاني</option>
+                <option value="هندي">هندي</option>
+                <option value="بنغلاديشي">بنغلاديشي</option>
+                <option value="إندونيسي">إندونيسي</option>
+                <option value="أخرى">أخرى</option>
+              </select>
             </div>
           </div>
         </div>
@@ -349,7 +373,7 @@
 
             <div class="input-group">
               <label for="city">مدينة الإقامة الحالية <span class="req">*</span></label>
-              <input type="text" id="city" name="city" placeholder="مثال: جدة، الرياض" required />
+              <input type="text" id="city" name="city" placeholder="مثال: مكة المكرمة، جدة، الرياض" required />
             </div>
           </div>
         </div>
@@ -361,8 +385,10 @@
             <div class="input-group">
               <label for="education">المؤهل التعليمي <span class="req">*</span></label>
               <select id="education" name="education" required>
-                <option value="" disabled selected>اختر أعلى مؤهل تعليمي...</option>
-                <option value="ثانوي">ثانوية عامة</option>
+                <option value="" disabled selected>اختر المؤهل التعليمي...</option>
+                <option value="ابتدائي">ابتدائي</option>
+                <option value="متوسط">متوسط</option>
+                <option value="ثانوي">ثانوي</option>
                 <option value="دبلوم">دبلوم</option>
                 <option value="بكالوريوس">بكالوريوس</option>
                 <option value="ماجستير">ماجستير</option>
@@ -371,20 +397,20 @@
             </div>
 
             <div class="input-group">
-              <label for="major">التخصص الأكاديمي</label>
-              <input type="text" id="major" name="major" placeholder="مثال: نظم معلومات، إدارة أعمال" />
+              <label for="major">التخصص الأكاديمي (إن وجد)</label>
+              <input type="text" id="major" name="major" placeholder="مثال: إدارة، أمن وسلامة، لغات" />
             </div>
           </div>
 
           <div class="grid-2">
             <div class="input-group">
               <label for="experience">سنوات الخبرة العملية</label>
-              <input type="number" id="experience" name="experience" min="0" max="40" placeholder="0 في حال كنت خريجاً حديثاً" />
+              <input type="number" id="experience" name="experience" min="0" max="40" placeholder="0 في حال عدم وجود خبرة سابقة" />
             </div>
 
             <div class="input-group">
               <label for="languages">اللغات المتقنة</label>
-              <input type="text" id="languages" name="languages" placeholder="مثال: العربية، الإنجليزية" />
+              <input type="text" id="languages" name="languages" placeholder="مثال: العربية، الإنجليزية، الأردية" />
             </div>
           </div>
         </div>
@@ -410,9 +436,9 @@
 
           <div class="grid-2">
             <div class="input-group file-group">
-              <label>وثيقة التخرج / الشهادة الأكاديمية</label>
+              <label>وثيقة التخرج / المؤهل التعليمي</label>
               <input type="file" id="qualificationFile" name="qualificationFile" accept=".pdf,image/jpeg,image/png" />
-              <label for="qualificationFile" class="file-label">اختر وثيقة التخرج...</label>
+              <label for="qualificationFile" class="file-label">اختر وثيقة المؤهل...</label>
             </div>
 
             <div class="input-group file-group">
