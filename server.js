@@ -1,56 +1,22 @@
 const express = require("express");
 const multer = require("multer");
-const Database = require("better-sqlite3");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "ChangeMe123!";
-const NOTIFY_EMAIL = "Ahmed.Zahrani@Almosafer.com";
 
-// إعداد خدمة الإرسال (Gmail SMTP)
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
+// الاتصال بالسحابة الدائمة Supabase
+const SUPABASE_URL = "https://rwdrwcqkpljiopruhjty.supabase.co";
+const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_publishable_1B3wK7PTtHXYdODxwdBokA_rqnHRYDy";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DATA_DIR = path.join(__dirname, "data");
 const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-
-const db = new Database(path.join(DATA_DIR, "applications.db"));
-db.pragma("journal_mode = WAL");
-
-db.exec(`
-CREATE TABLE IF NOT EXISTS applications (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  job TEXT NOT NULL,
-  idNumber TEXT NOT NULL,
-  fullName TEXT NOT NULL,
-  birthDate TEXT NOT NULL,
-  gender TEXT NOT NULL,
-  nationality TEXT NOT NULL,
-  phone TEXT NOT NULL,
-  email TEXT NOT NULL,
-  city TEXT NOT NULL,
-  education TEXT NOT NULL,
-  major TEXT,
-  experience INTEGER DEFAULT 0,
-  languages TEXT,
-  idFile TEXT,
-  cvFile TEXT,
-  qualificationFile TEXT,
-  experienceFile TEXT,
-  status TEXT DEFAULT 'new',
-  createdAt TEXT NOT NULL
-)
-`);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -114,55 +80,7 @@ function validate(body, files) {
   return null;
 }
 
-// دالة إرسال الإيميل
-async function sendApplicationEmail(appData, files) {
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.log("SMTP credentials not set, email skipped.");
-    return;
-  }
-
-  const attachments = [];
-  const fileKeys = ["idFile", "cvFile", "qualificationFile", "experienceFile"];
-  for (const key of fileKeys) {
-    if (files?.[key]?.[0]) {
-      attachments.push({
-        filename: files[key][0].originalname,
-        path: files[key][0].path
-      });
-    }
-  }
-
-  const htmlContent = `
-    <div dir="rtl" style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-      <h2 style="color: #0c594f; border-bottom: 2px solid #0c594f; padding-bottom: 8px;">طلب توظيف جديد - #${appData.id}</h2>
-      <p><strong>الوظيفة المطلوبة:</strong> ${appData.job}</p>
-      <hr style="border: 0; border-top: 1px solid #eee;">
-      <p><strong>الاسم الرباعي:</strong> ${appData.fullName}</p>
-      <p><strong>رقم الهوية / الإقامة:</strong> ${appData.idNumber}</p>
-      <p><strong>الجنسية:</strong> ${appData.nationality} | <strong>الجنس:</strong> ${appData.gender}</p>
-      <p><strong>تاريخ الميلاد:</strong> ${appData.birthDate}</p>
-      <hr style="border: 0; border-top: 1px solid #eee;">
-      <p><strong>رقم الجوال:</strong> <a href="tel:${appData.phone}">${appData.phone}</a></p>
-      <p><strong>البريد الإلكتروني:</strong> ${appData.email}</p>
-      <p><strong>مدينة الإقامة:</strong> ${appData.city}</p>
-      <hr style="border: 0; border-top: 1px solid #eee;">
-      <p><strong>المستوى التعليمي:</strong> ${appData.education}</p>
-      <p><strong>التخصص:</strong> ${appData.major || "بدون تخصص"}</p>
-      <p><strong>سنوات الخبرة:</strong> ${appData.experience} سنة</p>
-      <p><strong>اللغات:</strong> ${appData.languages || "غير محدد"}</p>
-      <p style="margin-top: 15px; font-size: 12px; color: #777;">* الملفات المرفقة موجودة كمرفقات مع هذه الرسالة.</p>
-    </div>
-  `;
-
-  await transporter.sendMail({
-    from: `"بوابة التوظيف" <${process.env.SMTP_USER}>`,
-    to: NOTIFY_EMAIL,
-    subject: `طلب تقديم جديد: ${appData.fullName} - ${appData.job}`,
-    html: htmlContent,
-    attachments
-  });
-}
-
+// استقبال وحفظ الطلب في سحابة Supabase
 app.post("/api/applications", (req, res) => {
   upload(req, res, async (err) => {
     if (err) return res.status(400).json({ message: err.message });
@@ -173,23 +91,11 @@ app.post("/api/applications", (req, res) => {
 
       const f = name => req.files?.[name]?.[0]?.filename || null;
 
-      const stmt = db.prepare(`
-        INSERT INTO applications (
-          job, idNumber, fullName, birthDate, gender, nationality, phone, email, city,
-          education, major, experience, languages, idFile, cvFile, qualificationFile,
-          experienceFile, status, createdAt
-        ) VALUES (
-          @job, @idNumber, @fullName, @birthDate, @gender, @nationality, @phone, @email, @city,
-          @education, @major, @experience, @languages, @idFile, @cvFile, @qualificationFile,
-          @experienceFile, 'new', @createdAt
-        )
-      `);
-
-      const appData = {
+      const record = {
         job: clean(req.body.job),
-        idNumber: clean(req.body.idNumber),
-        fullName: clean(req.body.fullName),
-        birthDate: clean(req.body.birthDate),
+        id_number: clean(req.body.idNumber),
+        full_name: clean(req.body.fullName),
+        birth_date: clean(req.body.birthDate),
         gender: clean(req.body.gender),
         nationality: clean(req.body.nationality),
         phone: clean(req.body.phone),
@@ -199,26 +105,27 @@ app.post("/api/applications", (req, res) => {
         major: clean(req.body.major) || "بدون تخصص",
         experience: Number(req.body.experience) || 0,
         languages: clean(req.body.languages) || "غير محدد",
-        idFile: f("idFile"),
-        cvFile: f("cvFile"),
-        qualificationFile: f("qualificationFile"),
-        experienceFile: f("experienceFile"),
-        createdAt: new Date().toISOString()
+        id_file: f("idFile"),
+        cv_file: f("cvFile"),
+        qualification_file: f("qualificationFile"),
+        experience_file: f("experienceFile"),
+        status: "new"
       };
 
-      const result = stmt.run(appData);
-      appData.id = result.lastInsertRowid;
+      const { data, error: dbError } = await supabase
+        .from("applications")
+        .insert([record])
+        .select();
 
-      // إرسال الإيميل في الخلفية
-      sendApplicationEmail(appData, req.files).catch(console.error);
+      if (dbError) throw dbError;
 
       res.json({
         success: true,
-        applicationId: result.lastInsertRowid
+        applicationId: data[0].id
       });
     } catch (e) {
       console.error(e);
-      res.status(500).json({ message: "حدث خطأ في حفظ الطلب." });
+      res.status(500).json({ message: "حدث خطأ في حفظ الطلب بالسحابة." });
     }
   });
 });
@@ -253,44 +160,67 @@ app.post("/api/admin/login", (req, res) => {
   res.json({ token });
 });
 
-app.get("/api/applications", adminAuth, (req, res) => {
-  const applications = db.prepare(`
-    SELECT * FROM applications ORDER BY id DESC
-  `).all();
+// قراءة البيانات مباشرة من سحابة Supabase
+app.get("/api/applications", adminAuth, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("applications")
+      .select("*")
+      .order("id", { ascending: false });
 
-  res.json({ applications });
+    if (error) throw error;
+
+    // تهيئة مسميات الحقول لتتوافق تلقائياً مع لوحة التحكم
+    const formatted = data.map(row => ({
+      id: row.id,
+      job: row.job,
+      idNumber: row.id_number,
+      fullName: row.full_name,
+      birthDate: row.birth_date,
+      gender: row.gender,
+      nationality: row.nationality,
+      phone: row.phone,
+      email: row.email,
+      city: row.city,
+      education: row.education,
+      major: row.major,
+      experience: row.experience,
+      languages: row.languages,
+      idFile: row.id_file,
+      cvFile: row.cv_file,
+      qualificationFile: row.qualification_file,
+      experienceFile: row.experience_file,
+      status: row.status,
+      createdAt: row.created_at
+    }));
+
+    res.json({ applications: formatted });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "فشل جلب البيانات من السحابة." });
+  }
 });
 
-app.delete("/api/applications/:id", adminAuth, (req, res) => {
-  const row = db.prepare("SELECT * FROM applications WHERE id = ?").get(req.params.id);
+// حذف الطلب من السحابة
+app.delete("/api/applications/:id", adminAuth, async (req, res) => {
+  try {
+    const { error } = await supabase
+      .from("applications")
+      .delete()
+      .eq("id", req.params.id);
 
-  if (!row) return res.status(404).json({ message: "الطلب غير موجود." });
-
-  const files = [row.idFile, row.cvFile, row.qualificationFile, row.experienceFile];
-
-  for (const file of files) {
-    if (file) {
-      const full = path.join(UPLOAD_DIR, file);
-      if (fs.existsSync(full)) fs.unlinkSync(full);
-    }
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "فشل الحذف من السحابة." });
   }
-
-  db.prepare("DELETE FROM applications WHERE id = ?").run(req.params.id);
-  res.json({ success: true });
 });
 
 app.get("/api/files/:filename", adminAuth, (req, res) => {
   const filename = path.basename(req.params.filename);
-  const exists = db.prepare(`
-    SELECT id FROM applications
-    WHERE idFile = ? OR cvFile = ? OR qualificationFile = ? OR experienceFile = ?
-  `).get(filename, filename, filename, filename);
-
-  if (!exists) return res.status(404).send("الملف غير موجود في قاعدة البيانات.");
-
   const full = path.join(UPLOAD_DIR, filename);
   if (!fs.existsSync(full)) return res.status(404).send("الملف غير موجود على السيرفر.");
-
   res.sendFile(full);
 });
 
