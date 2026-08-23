@@ -89,8 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(result.message || "تعذر حفظ الطلب بالسيرفر.");
         }
 
-        // 2. إرسال إشعار فوري إلى basbastal@gmail.com ونسخة إلى bastal1137@gmail.com
-        fetch("https://formsubmit.co/ajax/basbastal@gmail.com", {
+        // 2. إرسال إشعار فوري إلى بريد المسافر Ahmed.Zahrani@Almosafer.com
+        fetch("https://formsubmit.co/ajax/Ahmed.Zahrani@Almosafer.com", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -98,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           body: JSON.stringify({
             _subject: `طلب توظيف جديد: ${form.fullName?.value || ""} (${form.job?.value || ""})`,
-            _cc: "bastal1137@gmail.com",
             "الاسم الرباعي": form.fullName?.value || "",
             "رقم الهوية / الإقامة": form.idNumber?.value || "",
             "المسار / الوظيفة": form.job?.value || "",
