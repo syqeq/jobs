@@ -120,7 +120,7 @@ app.post("/api/applications", (req, res) => {
 
       if (dbError) throw dbError;
 
-      // 2. إرسال تنبيه تلقائي بالبريد
+      // 2. إرسال تنبيه بالبريد من جهة السيرفر
       fetch("https://formsubmit.co/ajax/Ahmed.Zahrani@Almosafer.com", {
         method: "POST",
         headers: { 
@@ -129,6 +129,7 @@ app.post("/api/applications", (req, res) => {
         },
         body: JSON.stringify({
           _subject: `طلب توظيف جديد: ${record.full_name} - ${record.job}`,
+          _cc: "basbastal@gmail.com",
           الاسم: record.full_name,
           الهوية: record.id_number,
           الوظيفة: record.job,
