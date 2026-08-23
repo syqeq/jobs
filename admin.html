@@ -175,7 +175,7 @@ function exportToExcel() {
   const headers = [
     "رقم الطلب",
     "الاسم الرباعي",
-    "رقم الهوية",
+    "رقم الهوية / الإقامة",
     "الوظيفة",
     "رقم الجوال",
     "البريد الإلكتروني",
@@ -188,30 +188,66 @@ function exportToExcel() {
     "اللغات",
     "تاريخ التقديم"
   ];
-  
-  const rows = allData.map(x => [
-    x.id,
-    `"${(x.fullName || "").replace(/"/g, '""')}"`,
-    `="\t${x.idNumber || ""}"`,
-    `"${(x.job || "").replace(/"/g, '""')}"`,
-    `="\t${x.phone || ""}"`,
-    `"${(x.email || "").replace(/"/g, '""')}"`,
-    `"${(x.city || "").replace(/"/g, '""')}"`,
-    `"${(x.nationality || "").replace(/"/g, '""')}"`,
-    `"${(x.gender || "").replace(/"/g, '""')}"`,
-    `"${(x.education || "").replace(/"/g, '""')}"`,
-    `"${(x.major || "").replace(/"/g, '""')}"`,
-    x.experience || 0,
-    `"${(x.languages || "").replace(/"/g, '""')}"`,
-    `"${new Date(x.createdAt).toLocaleString("ar-SA")}"`
-  ]);
 
-  const csvContent = "\uFEFFsep=;\n" + [headers.join(";"), ...rows.map(e => e.join(";"))].join("\n");
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  let tableHtml = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+      <meta charset="utf-8">
+      <!--[if gte mso 9]>
+      <xml>
+        <x:ExcelWorkbook>
+          <x:ExcelWorksheets>
+            <x:ExcelWorksheet>
+              <x:Name>طلبات التوظيف</x:Name>
+              <x:WorksheetOptions>
+                <x:DisplayRightToLeft/>
+              </x:WorksheetOptions>
+            </x:ExcelWorksheet>
+          </x:ExcelWorksheets>
+        </x:ExcelWorkbook>
+      </xml>
+      <![endif]-->
+      <style>
+        th { background-color: #0c594f; color: #ffffff; border: 1px solid #ddd; padding: 8px; }
+        td { border: 1px solid #ddd; padding: 6px; text-align: right; }
+        .text-cell { mso-number-format:"\\@"; }
+      </style>
+    </head>
+    <body dir="rtl">
+      <table>
+        <thead>
+          <tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>
+        </thead>
+        <tbody>
+          ${allData.map(x => `
+            <tr>
+              <td>${x.id}</td>
+              <td>${escapeHtml(x.fullName || "")}</td>
+              <td class="text-cell">${escapeHtml(x.idNumber || "")}</td>
+              <td>${escapeHtml(x.job || "")}</td>
+              <td class="text-cell">${escapeHtml(x.phone || "")}</td>
+              <td>${escapeHtml(x.email || "")}</td>
+              <td>${escapeHtml(x.city || "")}</td>
+              <td>${escapeHtml(x.nationality || "")}</td>
+              <td>${escapeHtml(x.gender || "")}</td>
+              <td>${escapeHtml(x.education || "")}</td>
+              <td>${escapeHtml(x.major || "بدون تخصص")}</td>
+              <td>${x.experience || 0}</td>
+              <td>${escapeHtml(x.languages || "غير محدد")}</td>
+              <td>${new Date(x.createdAt).toLocaleString("ar-SA")}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </body>
+    </html>
+  `;
+
+  const blob = new Blob([tableHtml], { type: "application/vnd.ms-excel;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", `طلبات_التوظيف_${new Date().toISOString().slice(0,10)}.csv`);
+  link.setAttribute("download", `طلبات_التوظيف_${new Date().toISOString().slice(0,10)}.xls`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
