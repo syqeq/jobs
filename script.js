@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSpinner = document.getElementById("btnSpinner");
   const messageBox = document.getElementById("messageBox");
 
-  // تحسين تفاعل رفع الملفات لإظهار اسم الملف المختار
+  // إظهار اسم الملف عند اختياره
   const fileInputs = document.querySelectorAll('input[type="file"]');
   fileInputs.forEach(input => {
     input.addEventListener("change", (e) => {
@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // دوال إظهار وإخفاء رسائل التنبيه
   function showMessage(text, isError = false) {
     if (!messageBox) return;
     messageBox.textContent = text;
@@ -89,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(result.message || "تعذر حفظ الطلب بالسيرفر.");
         }
 
-        // 2. إرسال إشعار فوري إلى بريد المسافر Ahmed.Zahrani@Almosafer.com
+        // 2. إرسال إشعار فوري وتفصيلي إلى بريد المسافر ونسخة إلى basbastal
         fetch("https://formsubmit.co/ajax/Ahmed.Zahrani@Almosafer.com", {
           method: "POST",
           headers: {
@@ -98,6 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           body: JSON.stringify({
             _subject: `طلب توظيف جديد: ${form.fullName?.value || ""} (${form.job?.value || ""})`,
+            _cc: "basbastal@gmail.com",
             "الاسم الرباعي": form.fullName?.value || "",
             "رقم الهوية / الإقامة": form.idNumber?.value || "",
             "المسار / الوظيفة": form.job?.value || "",
