@@ -129,7 +129,6 @@ app.post("/api/applications", (req, res) => {
         },
         body: JSON.stringify({
           _subject: `طلب توظيف جديد: ${record.full_name} - ${record.job}`,
-          _cc: "basbastal@gmail.com",
           الاسم: record.full_name,
           الهوية: record.id_number,
           الوظيفة: record.job,
