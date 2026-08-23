@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نموذج التقديم على الوظيفة</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <form id="applicationForm" novalidate>
+
+      <!-- 1. بيانات التقديم -->
+      <section class="section">
+        <div class="section-title">
+          <span class="number">1</span>
+          <h2>بيانات التقديم</h2>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="field">
+            <label>الوظيفة المتقدم لها <span>*</span></label>
+            <select name="job" required>
+              <option value="">-- اختر الوظيفة --</option>
+              <option>مطور برمجيات</option>
+              <option>محلل أمن سيبراني</option>
+              <option>مهندس شبكات</option>
+              <option>مسؤول دعم فني</option>
+              <option>أخصائي تقنية معلومات</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>رقم الهوية / الإقامة <span>*</span></label>
+            <input type="text" name="idNumber" inputmode="numeric" maxlength="10"
+                   placeholder="تبدأ بـ 1 للمواطن أو 2 للمقيم، 10 أرقام" required>
+          </div>
+
+          <div class="field">
+            <label>الاسم الرباعي <span>*</span></label>
+            <input type="text" name="fullName" placeholder="الاسم الأول ثم الأب والجد والعائلة" required>
+          </div>
+
+          <div class="field">
+            <label>تاريخ الميلاد <span>*</span></label>
+            <input type="date" name="birthDate" required>
+          </div>
+
+          <div class="field">
+            <label>الجنس <span>*</span></label>
+            <select name="gender" required>
+              <option value="">-- اختر --</option>
+              <option>ذكر</option>
+              <option>أنثى</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>الجنسية <span>*</span></label>
+            <select name="nationality" required>
+              <option value="">-- اختر --</option>
+              <option>سعودي</option>
+              <option>غير سعودي</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. معلومات التواصل -->
+      <section class="section">
+        <div class="section-title">
+          <span class="number">2</span>
+          <h2>معلومات التواصل</h2>
+        </div>
+
+        <div class="grid grid-3">
+          <div class="field">
+            <label>رقم الجوال <span>*</span></label>
+            <input type="tel" name="phone" placeholder="05XXXXXXXX" maxlength="10" required>
+          </div>
+
+          <div class="field">
+            <label>البريد الإلكتروني <span>*</span></label>
+            <input type="email" name="email" placeholder="name@example.com" required>
+          </div>
+
+          <div class="field">
+            <label>مدينة الإقامة <span>*</span></label>
+            <select name="city" required>
+              <option value="">-- اختر --</option>
+              <option>الرياض</option>
+              <option>جدة</option>
+              <option>مكة المكرمة</option>
+              <option>المدينة المنورة</option>
+              <option>الدمام</option>
+              <option>الخبر</option>
+              <option>أبها</option>
+              <option>تبوك</option>
+              <option>القصيم</option>
+              <option>أخرى</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. المؤهل والخبرة -->
+      <section class="section">
+        <div class="section-title">
+          <span class="number">3</span>
+          <h2>المؤهل والخبرة</h2>
+        </div>
+
+        <div class="grid grid-3">
+          <div class="field">
+            <label>المستوى التعليمي <span>*</span></label>
+            <select name="education" required>
+              <option value="">-- اختر --</option>
+              <option>ثانوية عامة</option>
+              <option>دبلوم</option>
+              <option>بكالوريوس</option>
+              <option>ماجستير</option>
+              <option>دكتوراه</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>التخصص (اختياري)</label>
+            <input type="text" name="major" placeholder="اختياري - مثال: أمن سيبراني">
+          </div>
+
+          <div class="field">
+            <label>سنوات الخبرة في مجال التخصص</label>
+            <input type="number" name="experience" min="0" max="60" value="0">
+          </div>
+        </div>
+
+        <div class="field languages">
+          <label>اللغات</label>
+          <input type="text" name="languages" placeholder="اختياري – مثال: العربية، الإنجليزية، الفرنسية">
+        </div>
+      </section>
+
+      <!-- 4. المرفقات -->
+      <section class="section">
+        <div class="section-title">
+          <span class="number">4</span>
+          <h2>المرفقات</h2>
+        </div>
+
+        <p class="attachment-note">
+          الصيغ المسموحة: JPG, PNG, PDF — بحد أقصى 10 ميجا لكل ملف.
+        </p>
+
+        <div class="attachments">
+          <div class="upload-box">
+            <label for="idFile">الهوية / الإقامة <span>*</span></label>
+            <div class="file-row">
+              <input id="idFile" name="idFile" type="file" accept=".jpg,.jpeg,.png,.pdf" required>
+              <label class="file-button" for="idFile">اختيار ملف</label>
+              <span class="file-name" id="idFileName">لم يتم اختيار أي ملف</span>
+            </div>
+          </div>
+
+          <div class="upload-box">
+            <label for="cvFile">السيرة الذاتية وخبرات العمل</label>
+            <div class="file-row">
+              <input id="cvFile" name="cvFile" type="file" accept=".jpg,.jpeg,.png,.pdf">
+              <label class="file-button" for="cvFile">اختيار ملف</label>
+              <span class="file-name" id="cvFileName">لم يتم اختيار أي ملف</span>
+            </div>
+          </div>
+
+          <div class="upload-box">
+            <label for="qualificationFile">شهادة المؤهل</label>
+            <div class="file-row">
+              <input id="qualificationFile" name="qualificationFile" type="file" accept=".jpg,.jpeg,.png,.pdf">
+              <label class="file-button" for="qualificationFile">اختيار ملف</label>
+              <span class="file-name" id="qualificationFileName">لم يتم اختيار أي ملف</span>
+            </div>
+          </div>
+
+          <div class="upload-box">
+            <label for="experienceFile">شهادة خبرة العاملين بالجهة (حسب الوظيفة)</label>
+            <div class="file-row">
+              <input id="experienceFile" name="experienceFile" type="file" accept=".jpg,.jpeg,.png,.pdf">
+              <label class="file-button" for="experienceFile">اختيار ملف</label>
+              <span class="file-name" id="experienceFileName">لم يتم اختيار أي ملف</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. الإقرار -->
+      <section class="section declaration-section">
+        <div class="section-title">
+          <span class="number">5</span>
+          <h2>الإقرار</h2>
+        </div>
+
+        <label class="declaration">
+          <input type="checkbox" id="agreement" required>
+          <span>
+            أقر بأن جميع البيانات والمعلومات المرفقة صحيحة، وأوافق على الشروط والأحكام
+            و<span class="privacy-link">سياسة الخصوصية</span> وأتحمل المسؤولية النظامية في حال ثبوت خلاف ذلك.
+          </span>
+        </label>
+
+        <div id="message" class="message" role="alert"></div>
+
+        <button type="submit" class="submit-button">
+          <span>إرسال الطلب</span>
+          <span class="send-icon">➤</span>
+        </button>
+      </section>
+
+    </form>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
