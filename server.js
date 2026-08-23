@@ -4,10 +4,21 @@ const Database = require("better-sqlite3");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "ChangeMe123!";
+const NOTIFY_EMAIL = "Ahmed.Zahrani@Almosafer.com";
+
+// إعداد خدمة الإرسال (Gmail SMTP)
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
 
 const DATA_DIR = path.join(__dirname, "data");
 const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
@@ -103,8 +114,57 @@ function validate(body, files) {
   return null;
 }
 
+// دالة إرسال الإيميل
+async function sendApplicationEmail(appData, files) {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log("SMTP credentials not set, email skipped.");
+    return;
+  }
+
+  const attachments = [];
+  const fileKeys = ["idFile", "cvFile", "qualificationFile", "experienceFile"];
+  for (const key of fileKeys) {
+    if (files?.[key]?.[0]) {
+      attachments.push({
+        filename: files[key][0].originalname,
+        path: files[key][0].path
+      });
+    }
+  }
+
+  const htmlContent = `
+    <div dir="rtl" style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+      <h2 style="color: #0c594f; border-bottom: 2px solid #0c594f; padding-bottom: 8px;">طلب توظيف جديد - #${appData.id}</h2>
+      <p><strong>الوظيفة المطلوبة:</strong> ${appData.job}</p>
+      <hr style="border: 0; border-top: 1px solid #eee;">
+      <p><strong>الاسم الرباعي:</strong> ${appData.fullName}</p>
+      <p><strong>رقم الهوية / الإقامة:</strong> ${appData.idNumber}</p>
+      <p><strong>الجنسية:</strong> ${appData.nationality} | <strong>الجنس:</strong> ${appData.gender}</p>
+      <p><strong>تاريخ الميلاد:</strong> ${appData.birthDate}</p>
+      <hr style="border: 0; border-top: 1px solid #eee;">
+      <p><strong>رقم الجوال:</strong> <a href="tel:${appData.phone}">${appData.phone}</a></p>
+      <p><strong>البريد الإلكتروني:</strong> ${appData.email}</p>
+      <p><strong>مدينة الإقامة:</strong> ${appData.city}</p>
+      <hr style="border: 0; border-top: 1px solid #eee;">
+      <p><strong>المستوى التعليمي:</strong> ${appData.education}</p>
+      <p><strong>التخصص:</strong> ${appData.major || "بدون تخصص"}</p>
+      <p><strong>سنوات الخبرة:</strong> ${appData.experience} سنة</p>
+      <p><strong>اللغات:</strong> ${appData.languages || "غير محدد"}</p>
+      <p style="margin-top: 15px; font-size: 12px; color: #777;">* الملفات المرفقة موجودة كمرفقات مع هذه الرسالة.</p>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: `"بوابة التوظيف" <${process.env.SMTP_USER}>`,
+    to: NOTIFY_EMAIL,
+    subject: `طلب تقديم جديد: ${appData.fullName} - ${appData.job}`,
+    html: htmlContent,
+    attachments
+  });
+}
+
 app.post("/api/applications", (req, res) => {
-  upload(req, res, (err) => {
+  upload(req, res, async (err) => {
     if (err) return res.status(400).json({ message: err.message });
 
     try {
@@ -125,7 +185,7 @@ app.post("/api/applications", (req, res) => {
         )
       `);
 
-      const result = stmt.run({
+      const appData = {
         job: clean(req.body.job),
         idNumber: clean(req.body.idNumber),
         fullName: clean(req.body.fullName),
@@ -144,7 +204,13 @@ app.post("/api/applications", (req, res) => {
         qualificationFile: f("qualificationFile"),
         experienceFile: f("experienceFile"),
         createdAt: new Date().toISOString()
-      });
+      };
+
+      const result = stmt.run(appData);
+      appData.id = result.lastInsertRowid;
+
+      // إرسال الإيميل في الخلفية
+      sendApplicationEmail(appData, req.files).catch(console.error);
 
       res.json({
         success: true,
