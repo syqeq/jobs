@@ -11,7 +11,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "ChangeMe123!";
 
 // الاتصال بالسحابة الدائمة Supabase
 const SUPABASE_URL = "https://rwdrwcqkpljiopruhjty.supabase.co";
-const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_publishable_1B3wK7PTtHXYdODxwdBokA_rqnHRYDy";
+const SUPABASE_KEY = process.env.SUPABASE_KEY || "";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DATA_DIR = path.join(__dirname, "data");
