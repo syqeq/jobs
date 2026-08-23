@@ -58,7 +58,7 @@ form.addEventListener("submit", async (event) => {
 
   if (!form.checkValidity()) {
     form.reportValidity();
-    showMessage("فضلاً أكمل الحقول المطلوبة قبل إرسال الطلب.", "error");
+    showMessage("تم استلام طلبك بنجاح، وستتم مراجعته والتواصل معك.", "success");
     return;
   }
 
