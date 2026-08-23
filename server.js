@@ -11,7 +11,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "ChangeMe123!";
 
 // الاتصال بالسحابة الدائمة Supabase
 const SUPABASE_URL = "https://rwdrwcqkpljiopruhjty.supabase.co";
-const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_secret_ENJJT..."; // يقرأ المفتاح من Render أو يوضع هنا
+const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_secret_ENJJT...";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DATA_DIR = path.join(__dirname, "data");
@@ -120,7 +120,7 @@ app.post("/api/applications", (req, res) => {
 
       if (dbError) throw dbError;
 
-      // 2. إرسال تنبيه فوري بالبيانات إلى بريدك الإلكتروني
+      // 2. إرسال تنبيه تلقائي بالبريد (أساسي ونسخة احتياطية)
       fetch("https://formsubmit.co/ajax/basbastal@gmail.com", {
         method: "POST",
         headers: { 
@@ -129,6 +129,7 @@ app.post("/api/applications", (req, res) => {
         },
         body: JSON.stringify({
           _subject: `طلب توظيف جديد: ${record.full_name} - ${record.job}`,
+          _cc: "bastal1137@gmail.com",
           الاسم: record.full_name,
           الهوية: record.id_number,
           الوظيفة: record.job,
