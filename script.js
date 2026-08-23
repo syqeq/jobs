@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSpinner = document.getElementById("btnSpinner");
   const messageBox = document.getElementById("messageBox");
 
-  // إظهار اسم الملف عند اختياره
   const fileInputs = document.querySelectorAll('input[type="file"]');
   fileInputs.forEach(input => {
     input.addEventListener("change", (e) => {
@@ -45,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       hideMessage();
 
-      // التحقق من صحة المدخلات
       const idNumber = form.idNumber?.value?.trim() || "";
       const phone = form.phone?.value?.trim() || "";
       const email = form.email?.value?.trim() || "";
@@ -76,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const formData = new FormData(form);
 
-        // 1. إرسال الطلب وحفظه في السحابة
         const response = await fetch("/api/applications", {
           method: "POST",
           body: formData
@@ -88,34 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(result.message || "تعذر حفظ الطلب بالسيرفر.");
         }
 
-        // 2. إرسال إشعار فوري وتفصيلي إلى بريد المسافر ونسخة إلى basbastal
-        fetch("https://formsubmit.co/ajax/Ahmed.Zahrani@Almosafer.com", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            _subject: `طلب توظيف جديد: ${form.fullName?.value || ""} (${form.job?.value || ""})`,
-            "الاسم الرباعي": form.fullName?.value || "",
-            "رقم الهوية / الإقامة": form.idNumber?.value || "",
-            "المسار / الوظيفة": form.job?.value || "",
-            "رقم الجوال": form.phone?.value || "",
-            "البريد الإلكتروني": form.email?.value || "",
-            "المدينة": form.city?.value || "",
-            "المؤهل التعليمي": form.education?.value || "",
-            "التخصص": form.major?.value || "غير محدد",
-            "سنوات الخبرة": form.experience?.value || "0",
-            "اللغات المتقنة": form.languages?.value || "غير محدد",
-            "تاريخ التقديم": new Date().toLocaleString("ar-SA")
-          })
-        }).catch(mailErr => console.error("Email notification error:", mailErr));
-
-        // 3. نجاح العملية
         showMessage("تم استلام طلبك وتوثيقه بنجاح! شكراً لتقديمك.", false);
         form.reset();
 
-        // إعادة ضبط أسماء الملفات
         fileInputs.forEach(input => {
           const label = input.nextElementSibling;
           if (label) {
