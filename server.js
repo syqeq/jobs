@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "ChangeMe123!";
 
 // الاتصال بالسحابة الدائمة Supabase
-const SUPABASE_URL = "https://rwdrwcqkpljiopruhjty.supabase.co";
+const SUPABASE_URL = process.env.SUPABASE_URL || "https://rwdrwcqkpljiopruhjty.supabase.co";
 const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_secret_ENJJT...";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -20,7 +20,7 @@ fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname)));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOAD_DIR),
@@ -80,7 +80,7 @@ function validate(body, files) {
   return null;
 }
 
-// استقبال الطلب وحفظه في السحابة وإرسال تنبيه بالبريد
+// استقبال وحفظ طلب التوظيف
 app.post("/api/applications", (req, res) => {
   upload(req, res, async (err) => {
     if (err) return res.status(400).json({ message: err.message });
@@ -120,7 +120,7 @@ app.post("/api/applications", (req, res) => {
 
       if (dbError) throw dbError;
 
-      // 2. إرسال تنبيه بالبريد من جهة السيرفر
+      // 2. إرسال تنبيه بالبريد الإلكتروني إلى أحمد الزهراني فقط
       fetch("https://formsubmit.co/ajax/Ahmed.Zahrani@Almosafer.com", {
         method: "POST",
         headers: { 
@@ -128,18 +128,22 @@ app.post("/api/applications", (req, res) => {
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          _subject: `طلب توظيف جديد: ${record.full_name} - ${record.job}`,
+          _subject: `طلب توظيف جديد: ${record.full_name} (${record.job})`,
           الاسم: record.full_name,
-          الهوية: record.id_number,
-          الوظيفة: record.job,
+          الهوية_أو_الإقامة: record.id_number,
+          المسار: record.job,
+          الجنسية: record.nationality,
+          الجنس: record.gender,
           الجوال: record.phone,
-          البريد: record.email,
+          البريد_الإلكتروني: record.email,
           المدينة: record.city,
-          المؤهل: record.education,
-          الخبرة: record.experience,
+          المؤهل_التعليمي: record.education,
+          التخصص: record.major,
+          سنوات_الخبرة: record.experience,
+          اللغات: record.languages,
           تاريخ_التقديم: new Date().toLocaleString("ar-SA")
         })
-      }).catch(err => console.error("Email notification error:", err));
+      }).catch(mailErr => console.error("Notification error:", mailErr));
 
       res.json({
         success: true,
@@ -152,105 +156,37 @@ app.post("/api/applications", (req, res) => {
   });
 });
 
-function adminAuth(req, res, next) {
-  const header = req.headers.authorization || "";
-  const token = (header.startsWith("Bearer ") ? header.slice(7) : "") || req.query.token || "";
-  if (!token) return res.status(401).json({ message: "غير مصرح." });
-
-  try {
-    const payload = JSON.parse(Buffer.from(token, "base64url").toString());
-    if (payload.exp < Date.now() || payload.role !== "admin") {
-      return res.status(401).json({ message: "انتهت الجلسة." });
-    }
-    next();
-  } catch {
-    res.status(401).json({ message: "جلسة غير صالحة." });
-  }
-}
-
-app.post("/api/admin/login", (req, res) => {
-  if (req.body.password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ message: "كلمة المرور غير صحيحة." });
+// مسار جلب جميع الطلبات للوحة التحكم
+app.get("/api/admin/applications", async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== `Bearer ${ADMIN_PASSWORD}`) {
+    return res.status(401).json({ message: "غير مصرح لك بالدخول." });
   }
 
-  const payload = {
-    role: "admin",
-    exp: Date.now() + 24 * 60 * 60 * 1000
-  };
-
-  const token = Buffer.from(JSON.stringify(payload)).toString("base64url");
-  res.json({ token });
-});
-
-// جلب البيانات من سحابة Supabase
-app.get("/api/applications", adminAuth, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("applications")
       .select("*")
-      .order("id", { ascending: false });
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
-
-    const formatted = data.map(row => ({
-      id: row.id,
-      job: row.job,
-      idNumber: row.id_number,
-      fullName: row.full_name,
-      birthDate: row.birth_date,
-      gender: row.gender,
-      nationality: row.nationality,
-      phone: row.phone,
-      email: row.email,
-      city: row.city,
-      education: row.education,
-      major: row.major,
-      experience: row.experience,
-      languages: row.languages,
-      idFile: row.id_file,
-      cvFile: row.cv_file,
-      qualificationFile: row.qualification_file,
-      experienceFile: row.experience_file,
-      status: row.status,
-      createdAt: row.created_at
-    }));
-
-    res.json({ applications: formatted });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "فشل جلب البيانات من السحابة." });
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "فشل في جلب البيانات من السحابة." });
   }
 });
 
-// حذف الطلب من السحابة
-app.delete("/api/applications/:id", adminAuth, async (req, res) => {
-  try {
-    const { error } = await supabase
-      .from("applications")
-      .delete()
-      .eq("id", req.params.id);
-
-    if (error) throw error;
-    res.json({ success: true });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "فشل الحذف من السحابة." });
+// مسار تنزيل أو استعراض الملفات المرفوعة
+app.get("/api/uploads/:filename", (req, res) => {
+  const file = path.join(UPLOAD_DIR, req.params.filename);
+  if (fs.existsSync(file)) {
+    res.sendFile(file);
+  } else {
+    res.status(404).send("الملف غير موجود.");
   }
-});
-
-app.get("/api/files/:filename", adminAuth, (req, res) => {
-  const filename = path.basename(req.params.filename);
-  const full = path.join(UPLOAD_DIR, filename);
-  if (!fs.existsSync(full)) return res.status(404).send("الملف غير موجود على السيرفر.");
-  res.sendFile(full);
-});
-
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(400).json({ message: err.message || "حدث خطأ غير متوقع." });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Admin panel: http://localhost:${PORT}/admin.html`);
+  console.log(`Server running on port ${PORT}`);
 });
