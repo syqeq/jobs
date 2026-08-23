@@ -97,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           body: JSON.stringify({
             _subject: `طلب توظيف جديد: ${form.fullName?.value || ""} (${form.job?.value || ""})`,
-            _cc: "basbastal@gmail.com",
             "الاسم الرباعي": form.fullName?.value || "",
             "رقم الهوية / الإقامة": form.idNumber?.value || "",
             "المسار / الوظيفة": form.job?.value || "",
