@@ -1,291 +1,220 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة إدارة الطلبات</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة إدارة الطلبات | مواسم - سييرا</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  
   <style>
-    *{box-sizing:border-box}
-    body{margin:0;background:#062b26;color:#333;font-family:Tahoma,Arial,sans-serif;min-height:100vh;padding:20px 0}
-    .wrap{max-width:1300px;margin:0 auto;padding:0 15px}
-    .top{background:#fff;border-radius:12px;padding:22px;box-shadow:0 4px 20px rgba(0,0,0,.15);margin-bottom:15px}
-    h1{margin:0 0 8px;font-size:22px;color:#0c594f}
-    .sub{color:#666;font-size:13px}
-    .stats{display:flex;gap:12px;margin-top:15px;flex-wrap:wrap}
-    .stat{background:#eef6f4;border-radius:9px;padding:12px 18px;min-width:150px;border:1px solid #d4e7e2}
-    .stat strong{display:block;font-size:22px;color:#0c594f}
-    .stat span{font-size:12px;color:#555}
-    
-    /* أدوات التصفية والتصدير */
-    .toolbar{background:#fff;border-radius:12px;padding:15px 20px;margin-bottom:15px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;box-shadow:0 4px 15px rgba(0,0,0,.1)}
-    .filters{display:flex;gap:10px;flex-wrap:wrap;flex:1}
-    .filters input, .filters select{height:38px;padding:0 10px;border:1px solid #cbd5e1;border-radius:6px;font-family:inherit;font-size:12px;outline:none}
-    .filters input{min-width:200px}
-    .btn-export{height:38px;padding:0 16px;background:#0c594f;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:12px;font-weight:bold;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background 0.2s}
-    .btn-export:hover{background:#073d36}
+    :root {
+      --primary: #0c594f;
+      --primary-hover: #09443c;
+      --bg: #073b34;
+      --card-bg: #ffffff;
+      --text: #2d3748;
+      --border: #e2e8f0;
+    }
 
-    .table-box{background:#fff;border-radius:12px;overflow:auto;box-shadow:0 4px 20px rgba(0,0,0,.15)}
-    table{width:100%;border-collapse:collapse;min-width:1000px}
-    th,td{padding:12px 10px;border-bottom:1px solid #eee;text-align:right;font-size:12px;vertical-align:middle}
-    th{background:#f8faf9;font-weight:700;color:#0c594f}
-    .actions a,.actions button{display:inline-block;margin:2px;padding:6px 10px;border:1px solid #cfdbd9;border-radius:6px;background:#fff;color:#0c594f;text-decoration:none;font-family:inherit;font-size:11px;font-weight:bold;cursor:pointer}
-    .actions a:hover{background:#eef6f4}
-    .danger{color:#a83d3d!important;border-color:#fca5a5!important}
-    .empty{padding:40px;text-align:center;color:#888}
-    .login{max-width:400px;margin:100px auto;background:#fff;padding:30px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
-    input.log-input{width:100%;height:42px;margin:10px 0 15px;padding:0 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit}
-    button.main{width:100%;height:44px;border:0;border-radius:8px;background:#0c594f;color:#fff;font-family:inherit;font-weight:bold;cursor:pointer}
-    .error{color:#a83d3d;font-size:12px;margin-bottom:10px}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #073b34 0%, #0c594f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      color: var(--text);
+    }
+
+    .dashboard-container {
+      width: 100%;
+      max-width: 1200px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 15px;
+    }
+
+    .dash-header h2 {
+      color: var(--primary);
+      font-size: 24px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      transition: 0.2s;
+    }
+
+    .export-btn {
+      background: #059669;
+      color: white;
+    }
+
+    .refresh-btn {
+      background: var(--primary);
+      color: white;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      max-height: 650px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+    }
+
+    th, td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--primary);
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+    }
+
+    .btn-link {
+      color: #0284c7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .btn-link:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
-<div id="app"></div>
-<script>
-const app = document.getElementById("app");
-let token = localStorage.getItem("adminToken");
-let allData = [];
 
-function loginPage(error="") {
-  app.innerHTML = `
-    <div class="login">
-      <h2 style="color:#0c594f;margin:0 0 10px">لوحة إدارة الطلبات</h2>
-      <p class="sub">سجّل الدخول لمشاهدة الطلبات وتصدير ملف Excel.</p>
-      ${error ? `<p class="error">${error}</p>` : ""}
-      <label style="font-size:13px;font-weight:bold">كلمة المرور</label>
-      <input id="password" class="log-input" type="password" placeholder="كلمة مرور الإدارة">
-      <button class="main" onclick="login()">دخول</button>
-    </div>`;
-  document.getElementById("password").addEventListener("keydown", e => {
-    if(e.key === "Enter") login();
-  });
-}
+  <div class="dashboard-container">
+    <div class="dash-header">
+      <h2>الطلبات المستلمة (<span id="totalCount">0</span>)</h2>
+      <div class="actions">
+        <button class="btn refresh-btn" onclick="loadData()">تحديث البيانات</button>
+        <button class="btn export-btn" onclick="exportToCSV()">تصدير Excel</button>
+      </div>
+    </div>
 
-async function login() {
-      const pass = document.getElementById("adminPass").value.trim();
-      if (!pass) {
-        alert("يرجى إدخال كلمة المرور");
-        return;
-      }
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>الاسم الرباعي</th>
+            <th>المسار المطلوب</th>
+            <th>رقم الهوية / الإقامة</th>
+            <th>الجوال</th>
+            <th>المدينة</th>
+            <th>المؤهل</th>
+            <th>الهوية</th>
+            <th>السيرة الذاتية</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="9" style="text-align:center; padding: 25px;">جاري تحميل البيانات...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
+  <script>
+    let appData = [];
+
+    async function loadData() {
       try {
-        // إرسال الباسورد عبر الرابط والـ Headers معاً لضمان وصوله بنسبة 100%
-        const res = await fetch(`/api/admin/applications?pass=${encodeURIComponent(pass)}`, {
-          headers: { 
-            "Authorization": `Bearer ${pass}`,
-            "x-admin-pass": pass 
-          }
-        });
-
-        if (res.status === 401) {
-          alert("كلمة المرور غير صحيحة!");
-          return;
-        }
-
-        if (!res.ok) throw new Error("تعذر الاتصال بالخادم");
-
-        appData = await res.json();
+        const res = await fetch("/api/admin/applications");
+        if (!res.ok) throw new Error("تعذر جلب البيانات");
         
-        document.getElementById("loginCard").style.display = "none";
-        document.getElementById("adminDash").style.display = "block";
+        appData = await res.json();
         document.getElementById("totalCount").innerText = appData.length;
-
         renderRows(appData);
-      } catch (e) {
-        alert("حدث خطأ أثناء جلب البيانات.");
-        console.error(e);
+      } catch (err) {
+        document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" style="text-align:center; color:red; padding: 20px;">تعذر الاتصال بقاعدة البيانات.</td></tr>`;
+        console.error(err);
       }
     }
 
-async function dashboard() {
-  const r = await fetch("/api/applications", {
-    headers: {Authorization:"Bearer " + token}
-  });
-  if(r.status === 401) {
-    localStorage.removeItem("adminToken");
-    token = null;
-    return loginPage("انتهت الجلسة.");
-  }
-  const data = await r.json();
-  allData = data.applications || [];
-  renderDashboard();
-}
+    function renderRows(items) {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
 
-function renderDashboard() {
-  const q = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
-  const jobFilter = document.getElementById("jobFilter")?.value || "";
-  const cityFilter = document.getElementById("cityFilter")?.value || "";
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 25px;">لا توجد أي طلبات مقدمة حتى الآن.</td></tr>`;
+        return;
+      }
 
-  let filtered = allData.filter(x => {
-    const matchQ = !q || (x.fullName && x.fullName.toLowerCase().includes(q)) || (x.idNumber && x.idNumber.includes(q)) || (x.phone && x.phone.includes(q));
-    const matchJob = !jobFilter || x.job === jobFilter;
-    const matchCity = !cityFilter || x.city === cityFilter;
-    return matchQ && matchJob && matchCity;
-  });
+      items.forEach((item, index) => {
+        const idLink = item.id_file ? `<a class="btn-link" href="/api/uploads/${item.id_file}" target="_blank">عرض</a>` : "-";
+        const cvLink = item.cv_file ? `<a class="btn-link" href="/api/uploads/${item.cv_file}" target="_blank">عرض</a>` : "-";
 
-  const uniqueJobs = [...new Set(allData.map(x => x.job).filter(Boolean))];
-  const uniqueCities = [...new Set(allData.map(x => x.city).filter(Boolean))];
+        tbody.innerHTML += `
+          <tr>
+            <td>${index + 1}</td>
+            <td><strong>${item.full_name || "-"}</strong></td>
+            <td>${item.job || "-"}</td>
+            <td>${item.id_number || "-"}</td>
+            <td>${item.phone || "-"}</td>
+            <td>${item.city || "-"}</td>
+            <td>${item.education || "-"}</td>
+            <td>${idLink}</td>
+            <td>${cvLink}</td>
+          </tr>
+        `;
+      });
+    }
 
-  app.innerHTML = `
-    <div class="wrap">
-      <div class="top">
-        <h1>لوحة إدارة طلبات التوظيف</h1>
-        <div class="sub">متابعة المتقدمين، تصفية المسارات، وتصدير قاعدة البيانات بصيغة Excel.</div>
-        <div class="stats">
-          <div class="stat"><strong>${allData.length}</strong><span>إجمالي الطلبات</span></div>
-          <div class="stat"><strong>${filtered.length}</strong><span>النتائج المعروضة</span></div>
-        </div>
-      </div>
+    function exportToCSV() {
+      if (!appData.length) return alert("لا توجد بيانات لتصديرها");
+      let csv = "\uFEFFالاسم,المسار,الهوية,الجوال,البريد,المدينة,المؤهل\n";
+      appData.forEach(r => {
+        csv += `"${r.full_name}","${r.job}","${r.id_number}","${r.phone}","${r.email}","${r.city}","${r.education}"\n`;
+      });
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `applications_${Date.now()}.csv`;
+      a.click();
+    }
 
-      <div class="toolbar">
-        <div class="filters">
-          <input type="text" id="searchInput" placeholder="بحث بالاسم، الهوية، أو الجوال..." value="${escapeHtml(q)}" oninput="renderDashboard()">
-          <select id="jobFilter" onchange="renderDashboard()">
-            <option value="">-- تصفية حسب الوظيفة --</option>
-            ${uniqueJobs.map(j => `<option value="${escapeHtml(j)}" ${jobFilter===j?'selected':''}>${escapeHtml(j)}</option>`).join("")}
-          </select>
-          <select id="cityFilter" onchange="renderDashboard()">
-            <option value="">-- تصفية حسب المدينة --</option>
-            ${uniqueCities.map(c => `<option value="${escapeHtml(c)}" ${cityFilter===c?'selected':''}>${escapeHtml(c)}</option>`).join("")}
-          </select>
-        </div>
-        <button class="btn-export" onclick="exportToExcel()">
-          📥 تصدير إلى Excel (CSV)
-        </button>
-      </div>
-
-      <div class="table-box">
-        ${filtered.length ? `
-        <table>
-          <thead><tr>
-            <th>رقم</th><th>الاسم والهوية</th><th>الوظيفة</th><th>الجوال</th><th>المدينة</th>
-            <th>المؤهل</th><th>الخبرة</th><th>التاريخ</th><th>المرفقات</th><th>إجراء</th>
-          </tr></thead>
-          <tbody>
-          ${filtered.map(x => `
-            <tr>
-              <td>#${x.id}</td>
-              <td><strong>${escapeHtml(x.fullName)}</strong><br><small style="color:#666">الهوية: ${escapeHtml(x.idNumber || "—")}</small></td>
-              <td><strong>${escapeHtml(x.job)}</strong></td>
-              <td><a href="tel:${escapeHtml(x.phone)}" style="color:#0c594f;text-decoration:none">${escapeHtml(x.phone)}</a></td>
-              <td>${escapeHtml(x.city)}</td>
-              <td>${escapeHtml(x.education)}<br><small style="color:#777">${escapeHtml(x.major || "بدون تخصص")}</small></td>
-              <td>${escapeHtml(String(x.experience || 0))} سنة</td>
-              <td>${new Date(x.createdAt).toLocaleString("ar-SA")}</td>
-              <td class="actions">
-                ${x.idFile ? `<a href="/api/files/${x.idFile}?token=${encodeURIComponent(token)}" target="_blank">الهوية</a>` : ""}
-                ${x.cvFile ? `<a href="/api/files/${x.cvFile}?token=${encodeURIComponent(token)}" target="_blank">السيرة</a>` : ""}
-                ${x.qualificationFile ? `<a href="/api/files/${x.qualificationFile}?token=${encodeURIComponent(token)}" target="_blank">المؤهل</a>` : ""}
-                ${x.experienceFile ? `<a href="/api/files/${x.experienceFile}?token=${encodeURIComponent(token)}" target="_blank">الخبرة</a>` : ""}
-              </td>
-              <td class="actions"><button class="danger" onclick="removeApp(${x.id})">حذف</button></td>
-            </tr>`).join("")}
-          </tbody>
-        </table>` : `<div class="empty">لا توجد نتائج مطابقة للتصفية.</div>`}
-      </div>
-    </div>`;
-}
-
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
-}
-
-function exportToExcel() {
-  if (!allData.length) return alert("لا توجد بيانات لتصديرها.");
-
-  const headers = [
-    "رقم الطلب",
-    "الاسم الرباعي",
-    "رقم الهوية / الإقامة",
-    "الوظيفة",
-    "رقم الجوال",
-    "البريد الإلكتروني",
-    "مدينة الإقامة",
-    "الجنسية",
-    "الجنس",
-    "المستوى التعليمي",
-    "التخصص",
-    "سنوات الخبرة",
-    "اللغات",
-    "تاريخ التقديم"
-  ];
-
-  let tableHtml = `
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-    <head>
-      <meta charset="utf-8">
-      <!--[if gte mso 9]>
-      <xml>
-        <x:ExcelWorkbook>
-          <x:ExcelWorksheets>
-            <x:ExcelWorksheet>
-              <x:Name>طلبات التوظيف</x:Name>
-              <x:WorksheetOptions>
-                <x:DisplayRightToLeft/>
-              </x:WorksheetOptions>
-            </x:ExcelWorksheet>
-          </x:ExcelWorksheets>
-        </x:ExcelWorkbook>
-      </xml>
-      <![endif]-->
-      <style>
-        th { background-color: #0c594f; color: #ffffff; border: 1px solid #ddd; padding: 8px; }
-        td { border: 1px solid #ddd; padding: 6px; text-align: right; }
-        .text-cell { mso-number-format:"\\@"; }
-      </style>
-    </head>
-    <body dir="rtl">
-      <table>
-        <thead>
-          <tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>
-        </thead>
-        <tbody>
-          ${allData.map(x => `
-            <tr>
-              <td>${x.id}</td>
-              <td>${escapeHtml(x.fullName || "")}</td>
-              <td class="text-cell">${escapeHtml(x.idNumber || "")}</td>
-              <td>${escapeHtml(x.job || "")}</td>
-              <td class="text-cell">${escapeHtml(x.phone || "")}</td>
-              <td>${escapeHtml(x.email || "")}</td>
-              <td>${escapeHtml(x.city || "")}</td>
-              <td>${escapeHtml(x.nationality || "")}</td>
-              <td>${escapeHtml(x.gender || "")}</td>
-              <td>${escapeHtml(x.education || "")}</td>
-              <td>${escapeHtml(x.major || "بدون تخصص")}</td>
-              <td>${x.experience || 0}</td>
-              <td>${escapeHtml(x.languages || "غير محدد")}</td>
-              <td>${new Date(x.createdAt).toLocaleString("ar-SA")}</td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    </body>
-    </html>
-  `;
-
-  const blob = new Blob([tableHtml], { type: "application/vnd.ms-excel;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", `طلبات_التوظيف_${new Date().toISOString().slice(0,10)}.xls`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-async function removeApp(id) {
-  if(!confirm("هل أنت متأكد من حذف الطلب؟")) return;
-  const r = await fetch("/api/applications/" + id, {
-    method:"DELETE",
-    headers:{Authorization:"Bearer " + token}
-  });
-  if(r.ok) dashboard();
-  else alert("تعذر حذف الطلب.");
-}
-
-if(token) dashboard(); else loginPage();
-</script>
+    // تشغيل تلقائي فور فتح الصفحة
+    loadData();
+  </script>
 </body>
 </html>
