@@ -7,7 +7,6 @@ const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "vAm3!B/7cgKFZ8J";
 
 // الاتصال بالسحابة الدائمة Supabase
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://rwdrwcqkpljiopruhjty.supabase.co";
@@ -112,38 +111,12 @@ app.post("/api/applications", (req, res) => {
         status: "new"
       };
 
-      // 1. الحفظ في سحابة Supabase
       const { data, error: dbError } = await supabase
         .from("applications")
         .insert([record])
         .select();
 
       if (dbError) throw dbError;
-
-      // 2. إرسال تنبيه بالبريد الإلكتروني إلى أحمد الزهراني فقط
-      fetch("https://formsubmit.co/ajax/Ahmed.Zahrani@Almosafer.com", {
-        method: "POST",
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          _subject: `طلب توظيف جديد: ${record.full_name} (${record.job})`,
-          الاسم: record.full_name,
-          الهوية_أو_الإقامة: record.id_number,
-          المسار: record.job,
-          الجنسية: record.nationality,
-          الجنس: record.gender,
-          الجوال: record.phone,
-          البريد_الإلكتروني: record.email,
-          المدينة: record.city,
-          المؤهل_التعليمي: record.education,
-          التخصص: record.major,
-          سنوات_الخبرة: record.experience,
-          اللغات: record.languages,
-          تاريخ_التقديم: new Date().toLocaleString("ar-SA")
-        })
-      }).catch(mailErr => console.error("Notification error:", mailErr));
 
       res.json({
         success: true,
@@ -156,19 +129,8 @@ app.post("/api/applications", (req, res) => {
   });
 });
 
-// مسار جلب جميع الطلبات للوحة التحكم
-// مسار جلب جميع الطلبات للوحة التحكم
-// مسار جلب جميع الطلبات للوحة التحكم
-// مسار جلب جميع الطلبات للوحة التحكم
+// مسار جلب جميع الطلبات للوحة التحكم (مفتوح ومباشر دون كلمة مرور)
 app.get("/api/admin/applications", async (req, res) => {
-  // استقبال الباسورد من أي مكان لتفادي أي خطأ إرسال
-  const pass = req.query.pass || req.headers["x-admin-pass"] || (req.headers.authorization || "").replace("Bearer ", "").trim();
-
-  // الباسورد المطلوب
-  if (pass !== "vAm3!B/7cgKFZ8J" && pass !== "ChangeMe123!" && pass !== "admin123") {
-    return res.status(401).json({ message: "غير مصرح لك بالدخول." });
-  }
-
   try {
     const { data, error } = await supabase
       .from("applications")
