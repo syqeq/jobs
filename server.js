@@ -158,18 +158,19 @@ app.get("/api/admin/applications", async (req, res) => {
 
 // مسار استعراض وتحميل الملفات المرفوعة
 // مسار استعراض وتحميل الملفات المرفوعة عبر Supabase Storage
+// مسار استعراض وتحميل الملفات المرفوعة عبر Supabase Storage
+// مسار استعراض وتحميل الملفات المرفوعة عبر Supabase Storage
 app.get("/api/uploads/:filename", async (req, res) => {
   try {
     const { filename } = req.params;
     
-    // محاولة جلب الرابط من Supabase Storage
-    const { data } = supabase.storage.from('resumes').getPublicUrl(filename);
+    // استخدام uploads بدلاً من resumes
+    const { data } = supabase.storage.from('uploads').getPublicUrl(filename);
     
     if (data && data.publicUrl) {
       return res.redirect(data.publicUrl);
     }
 
-    // فحص المجلد المحلي كخيار احتياطي
     const localFile = path.join(UPLOAD_DIR, filename);
     if (fs.existsSync(localFile)) {
       return res.sendFile(localFile);
