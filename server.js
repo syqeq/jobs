@@ -14,8 +14,17 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6Ik
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DATA_DIR = path.join(__dirname, "data");
-const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+const UPLOAD_DIR = process.env.VERCEL 
+  ? path.join('/tmp', 'uploads') 
+  : path.join(__dirname, 'data', 'uploads');
+
+if (!fs.existsSync(UPLOAD_DIR)) {
+  try {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  } catch (err) {
+    console.warn('Could not create upload directory:', err.message);
+  }
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
