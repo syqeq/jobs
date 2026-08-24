@@ -347,9 +347,9 @@
       }
 
       items.forEach((item, index) => {
-        const idLink = item.id_file ? `<a class="file-badge" href="/api/uploads/${item.id_file}" target="_blank">عرض الهوية</a>` : `<span class="empty-file">-</span>`;
-        const cvLink = item.cv_file ? `<a class="file-badge" href="/api/uploads/${item.cv_file}" target="_blank">عرض السيرة</a>` : `<span class="empty-file">-</span>`;
-
+       const getIdHref = (f) => f ? (f.startsWith("http") ? f : `/api/uploads/${f}`) : null;
+    const idLink = getIdHref(item.id_file) ? `<a class="file-badge" href="${getIdHref(item.id_file)}" target="_blank">عرض الهوية</a>` : `<span class="empty-file">-</span>`;
+    const cvLink = getIdHref(item.cv_file) ? `<a class="file-badge" href="${getIdHref(item.cv_file)}" target="_blank">عرض السيرة</a>` : `<span class="empty-file">-</span>`;
         tbody.innerHTML += `
           <tr>
             <td>${index + 1}</td>
