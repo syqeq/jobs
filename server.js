@@ -157,9 +157,15 @@ app.post("/api/applications", (req, res) => {
 });
 
 // مسار جلب جميع الطلبات للوحة التحكم
+// مسار جلب جميع الطلبات للوحة التحكم
 app.get("/api/admin/applications", async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || authHeader !== `Bearer ${ADMIN_PASSWORD}`) {
+  const authHeader = req.headers.authorization || "";
+  
+  // تنظيف التوكن المرسل سواء جاء بكلمة Bearer أو بدونها
+  const token = authHeader.replace("Bearer ", "").trim();
+
+  // التحقق المباشر والقاطع من الباسورد
+  if (token !== "vAm3!B/7cgKFZ8J") {
     return res.status(401).json({ message: "غير مصرح لك بالدخول." });
   }
 
