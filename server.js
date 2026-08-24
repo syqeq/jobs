@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 // الاتصال بـ Supabase
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://rwdrwcqkpljiopruhjty.supabase.co";
-const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_secret_ENJJT...";
+const SUPABASE_KEY = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3ZHJ3Y3FrcGxqaW9wcnVoanR5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NzUxMzAwMywiZXhwIjoyMTAzMDg5MDAzfQ.YUFQIf-pNMi80Lnd4Py3ZTmbl3XsxANdU4kXVdmfIdo";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DATA_DIR = path.join(__dirname, "data");
