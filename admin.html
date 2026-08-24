@@ -61,18 +61,40 @@ function loginPage(error="") {
 }
 
 async function login() {
-  const password = document.getElementById("password").value;
-  const r = await fetch("/api/admin/login", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({password})
-  });
-  const data = await r.json();
-  if(!r.ok) return loginPage(data.message || "بيانات الدخول غير صحيحة");
-  token = data.token;
-  localStorage.setItem("adminToken", token);
-  dashboard();
-}
+      const pass = document.getElementById("adminPass").value.trim();
+      if (!pass) {
+        alert("يرجى إدخال كلمة المرور");
+        return;
+      }
+
+      try {
+        // إرسال الباسورد عبر الرابط والـ Headers معاً لضمان وصوله بنسبة 100%
+        const res = await fetch(`/api/admin/applications?pass=${encodeURIComponent(pass)}`, {
+          headers: { 
+            "Authorization": `Bearer ${pass}`,
+            "x-admin-pass": pass 
+          }
+        });
+
+        if (res.status === 401) {
+          alert("كلمة المرور غير صحيحة!");
+          return;
+        }
+
+        if (!res.ok) throw new Error("تعذر الاتصال بالخادم");
+
+        appData = await res.json();
+        
+        document.getElementById("loginCard").style.display = "none";
+        document.getElementById("adminDash").style.display = "block";
+        document.getElementById("totalCount").innerText = appData.length;
+
+        renderRows(appData);
+      } catch (e) {
+        alert("حدث خطأ أثناء جلب البيانات.");
+        console.error(e);
+      }
+    }
 
 async function dashboard() {
   const r = await fetch("/api/applications", {
