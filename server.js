@@ -157,19 +157,29 @@ app.get("/api/admin/applications", async (req, res) => {
 });
 
 // مسار استعراض وتحميل الملفات المرفوعة
-app.get("/api/uploads/:filename", (req, res) => {
-  const file = path.join(UPLOAD_DIR, req.params.filename);
-  if (fs.existsSync(file)) {
-    res.sendFile(file);
-  } else {
+// مسار استعراض وتحميل الملفات المرفوعة عبر Supabase Storage
+app.get("/api/uploads/:filename", async (req, res) => {
+  try {
+    const { filename } = req.params;
+    
+    // محاولة جلب الرابط من Supabase Storage
+    const { data } = supabase.storage.from('resumes').getPublicUrl(filename);
+    
+    if (data && data.publicUrl) {
+      return res.redirect(data.publicUrl);
+    }
+
+    // فحص المجلد المحلي كخيار احتياطي
+    const localFile = path.join(UPLOAD_DIR, filename);
+    if (fs.existsSync(localFile)) {
+      return res.sendFile(localFile);
+    }
+
     res.status(404).send("الملف غير موجود.");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("حدث خطأ أثناء جلب الملف.");
   }
 });
-if (!process.env.VERCEL) {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
 
 module.exports = app;
