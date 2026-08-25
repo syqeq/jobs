@@ -13,7 +13,6 @@ const SUPABASE_URL = process.env.SUPABASE_URL || "https://rwdrwcqkpljiopruhjty.s
 const SUPABASE_KEY = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3ZHJ3Y3FrcGxqaW9wcnVoanR5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NzUxMzAwMywiZXhwIjoyMTAzMDg5MDAzfQ.YUFQIf-pNMi80Lnd4Py3ZTmbl3XsxANdU4kXVdmfIdo";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const DATA_DIR = path.join(__dirname, "data");
 const UPLOAD_DIR = process.env.VERCEL 
   ? path.join('/tmp', 'uploads') 
   : path.join(__dirname, 'data', 'uploads');
@@ -30,17 +29,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// حفظ الملفات على القرص المحلي لضمان وجود الرابط دائماً
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `${Date.now()}-${crypto.randomUUID()}${ext}`);
-  }
-});
-
+// استخدام الذاكرة لرفع الملفات مباشرة إلى Supabase Storage
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024, files: 4 },
   fileFilter: (req, file, cb) => {
     const allowed = ["application/pdf", "image/jpeg", "image/png"];
@@ -77,6 +68,26 @@ function validate(body, files) {
   return null;
 }
 
+// دالة مساعدة لرفع الملف إلى Supabase Storage
+async function uploadToSupabase(file) {
+  if (!file) return null;
+  const ext = path.extname(file.originalname).toLowerCase();
+  const filename = `${Date.now()}-${crypto.randomUUID()}${ext}`;
+
+  const { data, error } = await supabase.storage
+    .from("uploads")
+    .upload(filename, file.buffer, {
+      contentType: file.mimetype,
+      upsert: true
+    });
+
+  if (error) {
+    console.error("خطأ أثناء رفع الملف إلى Supabase:", error);
+    return null;
+  }
+  return filename;
+}
+
 // استقبال وحفظ طلب التوظيف
 app.post("/api/applications", (req, res) => {
   upload(req, res, async (err) => {
@@ -86,7 +97,11 @@ app.post("/api/applications", (req, res) => {
       const error = validate(req.body, req.files);
       if (error) return res.status(400).json({ message: error });
 
-      const f = name => req.files?.[name]?.[0]?.filename || null;
+      // رفع الملفات إلى Supabase Storage
+      const idFile = req.files?.idFile?.[0] ? await uploadToSupabase(req.files.idFile[0]) : null;
+      const cvFile = req.files?.cvFile?.[0] ? await uploadToSupabase(req.files.cvFile[0]) : null;
+      const qualificationFile = req.files?.qualificationFile?.[0] ? await uploadToSupabase(req.files.qualificationFile[0]) : null;
+      const experienceFile = req.files?.experienceFile?.[0] ? await uploadToSupabase(req.files.experienceFile[0]) : null;
 
       const record = {
         job: clean(req.body.job),
@@ -102,10 +117,10 @@ app.post("/api/applications", (req, res) => {
         major: clean(req.body.major) || "بدون تخصص",
         experience: Number(req.body.experience) || 0,
         languages: clean(req.body.languages) || "غير محدد",
-        id_file: f("idFile"),
-        cv_file: f("cvFile"),
-        qualification_file: f("qualificationFile"),
-        experience_file: f("experienceFile"),
+        id_file: idFile,
+        cv_file: cvFile,
+        qualification_file: qualificationFile,
+        experience_file: experienceFile,
         status: "new"
       };
 
@@ -156,15 +171,12 @@ app.get("/api/admin/applications", async (req, res) => {
   }
 });
 
-// مسار استعراض وتحميل الملفات المرفوعة
-// مسار استعراض وتحميل الملفات المرفوعة عبر Supabase Storage
-// مسار استعراض وتحميل الملفات المرفوعة عبر Supabase Storage
 // مسار استعراض وتحميل الملفات المرفوعة عبر Supabase Storage
 app.get("/api/uploads/:filename", async (req, res) => {
   try {
     const { filename } = req.params;
     
-    // استخدام uploads بدلاً من resumes
+    // جلب الرابط المباشر من سلة التخزين uploads
     const { data } = supabase.storage.from('uploads').getPublicUrl(filename);
     
     if (data && data.publicUrl) {
@@ -182,5 +194,11 @@ app.get("/api/uploads/:filename", async (req, res) => {
     res.status(500).send("حدث خطأ أثناء جلب الملف.");
   }
 });
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 module.exports = app;
