@@ -186,7 +186,7 @@
     .btn-logout { background: #f8fafc; color: var(--text-muted); border: 1px solid var(--border); }
     .btn-logout:hover { background: #fee2e2; color: #dc2626; }
 
-    /* بطاقات الحالات العلوية */
+    /* بطاقات الحالات العلوية الخمسة */
     .stats-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -584,8 +584,8 @@
         if (!res.ok) throw new Error("تعذر جلب البيانات");
 
         const data = await res.json();
-        // إسناد الحالة المحفوظة محلياً أو الافتراضية
         const localStatuses = JSON.parse(localStorage.getItem("app_statuses") || "{}");
+        
         rawApplications = data.map(app => ({
           ...app,
           status: localStatuses[app.id] || app.status || "جديد"
@@ -599,23 +599,44 @@
     }
 
     function updateStats() {
-      document.getElementById("totalCount").innerText = rawApplications.length;
-      document.getElementById("newCount").innerText = rawApplications.filter(a => a.status === "جديد").length;
-      document.getElementById("reviewCount").innerText = rawApplications.filter(a => a.status === "قيد المراجعة").length;
-      document.getElementById("acceptedCount").innerText = rawApplications.filter(a => a.status === "مقبول").length;
-      document.getElementById("rejectedCount").innerText = rawApplications.filter(a => a.status === "مرفوض").length;
+      const total = rawApplications.length;
+      const newC = rawApplications.filter(a => a.status === "جديد").length;
+      const revC = rawApplications.filter(a => a.status === "قيد المراجعة").length;
+      const accC = rawApplications.filter(a => a.status === "مقبول").length;
+      const rejC = rawApplications.filter(a => a.status === "مرفوض").length;
+
+      document.getElementById("totalCount").innerText = total;
+      document.getElementById("newCount").innerText = newC;
+      document.getElementById("reviewCount").innerText = revC;
+      document.getElementById("acceptedCount").innerText = accC;
+      document.getElementById("rejectedCount").innerText = rejC;
     }
 
-    function updateStatus(id, newStatus) {
-      const item = rawApplications.find(a => a.id === id);
+    function updateStatus(id, newStatus, selectElem) {
+      const item = rawApplications.find(a => String(a.id) === String(id));
       if (item) {
         item.status = newStatus;
         const localStatuses = JSON.parse(localStorage.getItem("app_statuses") || "{}");
         localStatuses[id] = newStatus;
         localStorage.setItem("app_statuses", JSON.stringify(localStatuses));
+        
+        // تحديث لون القائمة فورياً
+        selectElem.className = `status-select status-${getStatusClass(newStatus)}`;
+        
         updateStats();
-        filterData();
+
+        const currentStatusFilter = document.getElementById("statusFilter").value;
+        if (currentStatusFilter && currentStatusFilter !== newStatus) {
+          filterData();
+        }
       }
+    }
+
+    function getStatusClass(status) {
+      if (status === "مقبول") return "accepted";
+      if (status === "قيد المراجعة") return "review";
+      if (status === "مرفوض") return "rejected";
+      return "new";
     }
 
     function filterData() {
@@ -651,12 +672,8 @@
           return `<a class="file-badge" href="${href}" target="_blank">📄 ${title}</a>`;
         };
 
-        const statusClass = {
-          "جديد": "status-new",
-          "قيد المراجعة": "status-review",
-          "مقبول": "status-accepted",
-          "مرفوض": "status-rejected"
-        }[item.status] || "status-new";
+        const currentStatus = item.status || "جديد";
+        const statusClass = `status-${getStatusClass(currentStatus)}`;
 
         tbody.innerHTML += `
           <tr id="row-${item.id}">
@@ -664,11 +681,11 @@
             <td><strong>${item.full_name || "-"}</strong></td>
             <td>${renderTrackBadge(item.job)}</td>
             <td>
-              <select class="status-select ${statusClass}" onchange="updateStatus('${item.id}', this.value)">
-                <option value="جديد" ${item.status === 'جديد' ? 'selected' : ''}>جديد</option>
-                <option value="قيد المراجعة" ${item.status === 'قيد المراجعة' ? 'selected' : ''}>قيد المراجعة</option>
-                <option value="مقبول" ${item.status === 'مقبول' ? 'selected' : ''}>مقبول</option>
-                <option value="مرفوض" ${item.status === 'مرفوض' ? 'selected' : ''}>مرفوض</option>
+              <select class="status-select ${statusClass}" onchange="updateStatus('${item.id}', this.value, this)">
+                <option value="جديد" ${currentStatus === 'جديد' ? 'selected' : ''}>جديد</option>
+                <option value="قيد المراجعة" ${currentStatus === 'قيد المراجعة' ? 'selected' : ''}>قيد المراجعة</option>
+                <option value="مقبول" ${currentStatus === 'مقبول' ? 'selected' : ''}>مقبول</option>
+                <option value="مرفوض" ${currentStatus === 'مرفوض' ? 'selected' : ''}>مرفوض</option>
               </select>
             </td>
             <td><code>${item.id_number || "-"}</code></td>
@@ -695,7 +712,7 @@
         const res = await fetch(`/api/admin/applications/${id}`, { method: "DELETE" });
         if (!res.ok) throw new Error("فشل الحذف");
 
-        rawApplications = rawApplications.filter(a => a.id !== id);
+        rawApplications = rawApplications.filter(a => String(a.id) !== String(id));
         updateStats();
         filterData();
       } catch (e) {
