@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة إدارة الطلبات | مواسم - سييرا</title>
+  <title>لوحة إدارة الطلبات | مجموعة سيرا - مواسم</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
@@ -12,15 +12,19 @@
     :root {
       --primary: #0c594f;
       --primary-hover: #09443c;
+      --primary-light: #e6f4ea;
       --accent: #d4a373;
       --bg: #073b34;
       --card-bg: #ffffff;
-      --text: #2d3748;
-      --text-muted: #718096;
-      --border: #e2e8f0;
-      --danger: #e53e3e;
-      --danger-hover: #c53030;
-      --radius: 12px;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --danger: #ef4444;
+      --danger-bg: #fee2e2;
+      --radius: 14px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08);
+      --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
     }
 
     * {
@@ -45,7 +49,7 @@
       width: 100%;
       height: 100%;
       background: rgba(7, 59, 52, 0.95);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -57,80 +61,92 @@
       background: #ffffff;
       width: 100%;
       max-width: 420px;
-      padding: 35px 30px;
+      padding: 40px 32px;
       border-radius: var(--radius);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
       text-align: center;
+    }
+
+    .login-logo {
+      width: 170px;
+      height: auto;
+      margin: 0 auto 18px auto;
+      display: block;
     }
 
     .login-card h2 {
       color: var(--primary);
-      font-size: 20px;
+      font-size: 21px;
       font-weight: 800;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .login-card p {
       color: var(--text-muted);
-      font-size: 13px;
+      font-size: 13.5px;
       margin-bottom: 25px;
     }
 
     .login-input {
       width: 100%;
-      padding: 12px 16px;
+      padding: 13px 16px;
       border: 1.5px solid var(--border);
-      border-radius: 8px;
-      font-size: 14px;
+      border-radius: 10px;
+      font-size: 14.5px;
       outline: none;
       margin-bottom: 15px;
       text-align: center;
       letter-spacing: 2px;
+      background: #f9fafb;
+      transition: all 0.2s ease;
     }
 
     .login-input:focus {
       border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(12, 89, 79, 0.15);
     }
 
     .btn-login {
       width: 100%;
-      padding: 12px;
+      padding: 13px;
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 14.5px;
+      border-radius: 10px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      transition: 0.2s;
+      transition: all 0.2s;
     }
 
     .btn-login:hover {
       background: var(--primary-hover);
+      transform: translateY(-1px);
     }
 
     .login-error {
       color: var(--danger);
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 600;
       margin-top: 12px;
       display: none;
     }
 
-    /* لوحة التحكم */
+    /* لوحة التحكم الرئيسية */
     .container {
-      max-width: 1550px;
+      max-width: 1600px;
       margin: 0 auto;
       background: var(--card-bg);
       border-radius: var(--radius);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
       overflow: hidden;
-      display: none; /* مخفي حتى إدخال كلمة المرور */
+      display: none;
     }
 
     .header {
       background: #ffffff;
-      padding: 22px 30px;
+      padding: 24px 32px;
       border-bottom: 3px solid var(--primary);
       display: flex;
       justify-content: space-between;
@@ -139,8 +155,20 @@
       gap: 15px;
     }
 
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .panel-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+    }
+
     .header-title h1 {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 800;
       color: var(--primary);
     }
@@ -148,24 +176,26 @@
     .header-title p {
       font-size: 13px;
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: 3px;
+      font-weight: 500;
     }
 
     .header-actions {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .btn {
-      padding: 9px 16px;
-      border-radius: 8px;
+      padding: 10px 18px;
+      border-radius: 9px;
       font-size: 13.5px;
       font-weight: 700;
       cursor: pointer;
       border: none;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       transition: all 0.2s ease;
     }
 
@@ -175,86 +205,133 @@
     .btn-excel { background: #059669; color: white; }
     .btn-excel:hover { background: #047857; }
 
-    .btn-logout { background: #f1f5f9; color: var(--text-muted); border: 1px solid var(--border); }
-    .btn-logout:hover { background: #fee2e2; color: var(--danger); }
+    .btn-logout { background: #f8fafc; color: var(--text-muted); border: 1px solid var(--border); }
+    .btn-logout:hover { background: #fee2e2; color: var(--danger); border-color: #fca5a5; }
 
+    /* بطاقات الإحصائيات */
     .stats-bar {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      padding: 15px 30px;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      padding: 20px 32px;
       background: #f8fafc;
       border-bottom: 1px solid var(--border);
     }
 
     .stat-card {
       background: white;
-      padding: 12px 20px;
-      border-radius: 8px;
+      padding: 16px 20px;
+      border-radius: 12px;
       border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .stat-card .num {
-      font-size: 22px;
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-info .num {
+      font-size: 24px;
       font-weight: 800;
       color: var(--primary);
+      line-height: 1.2;
     }
 
-    .stat-card .label {
+    .stat-info .label {
       font-size: 12.5px;
       color: var(--text-muted);
       font-weight: 600;
+      margin-top: 4px;
     }
 
-    .controls-bar {
-      padding: 15px 30px;
+    .stat-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
       display: flex;
-      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    /* شريط البحث والفلترة */
+    .controls-bar {
+      padding: 18px 32px;
+      display: flex;
+      gap: 14px;
       flex-wrap: wrap;
       background: white;
       border-bottom: 1px solid var(--border);
+      align-items: center;
     }
 
     .search-box {
       flex: 1;
-      min-width: 250px;
+      min-width: 280px;
+      position: relative;
     }
 
-    .search-box input,
-    .filter-box select {
+    .search-box input {
       width: 100%;
-      padding: 9px 14px;
+      padding: 11px 16px;
       border: 1.5px solid var(--border);
-      border-radius: 8px;
+      border-radius: 9px;
       outline: none;
       font-size: 13.5px;
-      background: #f8fafc;
+      background: #f9fafb;
+      transition: all 0.2s;
     }
 
-    .search-box input:focus,
+    .search-box input:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(12, 89, 79, 0.12);
+    }
+
+    .filter-box select {
+      padding: 11px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      outline: none;
+      font-size: 13.5px;
+      background: #f9fafb;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+    }
+
     .filter-box select:focus {
       border-color: var(--primary);
       background: #fff;
     }
 
+    /* جدول المتقدمين */
     .table-container {
-      padding: 15px 30px 30px;
+      padding: 10px 32px 32px;
       overflow-x: auto;
-      max-height: 700px;
+      max-height: 720px;
     }
 
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       text-align: right;
     }
 
     th {
-      background: #f1f5f9;
+      background: #f8fafc;
       color: var(--primary);
-      font-weight: 700;
+      font-weight: 800;
       font-size: 13px;
-      padding: 12px 10px;
+      padding: 14px 12px;
       border-bottom: 2px solid var(--border);
       position: sticky;
       top: 0;
@@ -263,51 +340,72 @@
     }
 
     td {
-      padding: 12px 10px;
+      padding: 14px 12px;
       border-bottom: 1px solid var(--border);
       font-size: 13px;
       white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    tbody tr {
+      transition: background-color 0.15s ease;
     }
 
     tbody tr:hover {
-      background: #f8fafc;
+      background: #f9fafb;
     }
 
-    .badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 50px;
-      font-size: 11.5px;
+    /* الشارات الهندسية للمسارات الوظيفية */
+    .track-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: 700;
-      background: #e6fffa;
-      color: #0c594f;
-      border: 1px solid #b2f5ea;
+      white-space: nowrap;
+      border: 1px solid rgba(0, 0, 0, 0.06);
     }
 
+    .track-shape {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    /* أزرار الملفات والإجراءات */
     .file-badge {
       display: inline-flex;
       align-items: center;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11.5px;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 7px;
+      font-size: 12px;
       font-weight: 700;
       text-decoration: none;
-      background: #e0f2fe;
-      color: #0284c7;
-      transition: 0.2s;
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+      transition: all 0.2s ease;
     }
 
     .file-badge:hover {
-      background: #0284c7;
+      background: #2563eb;
       color: #fff;
+      transform: translateY(-1px);
     }
 
     .btn-delete {
-      background: #fee2e2;
+      background: var(--danger-bg);
       color: var(--danger);
       border: 1px solid #fca5a5;
-      padding: 4px 8px;
-      border-radius: 6px;
+      padding: 6px 12px;
+      border-radius: 7px;
       cursor: pointer;
       font-weight: 700;
       font-size: 12px;
@@ -322,6 +420,8 @@
     .empty-file {
       color: #cbd5e1;
       font-weight: bold;
+      text-align: center;
+      display: block;
     }
   </style>
 </head>
@@ -330,6 +430,7 @@
   <!-- شاشة الدخول المقفلة بكلمة المرور -->
   <div id="loginOverlay">
     <div class="login-card">
+      <img src="https://rwdrwcqkpljiopruhjty.supabase.co/storage/v1/object/public/uploads/1787625052832-a49c3d2b-ee78-41b8-a709-e832fb9d310c.jpeg" alt="مجموعة سيرا" class="login-logo" />
       <h2>بوابة الإدارة المركزية</h2>
       <p>يرجى إدخال كلمة المرور المعتمدة للوصول للوحة الطلبات</p>
       <form onsubmit="handleLogin(event)">
@@ -343,35 +444,54 @@
   <!-- لوحة التحكم الرئيسية -->
   <div class="container" id="adminPanel">
     <header class="header">
-      <div class="header-title">
-        <h1>لوحة إدارة ومعالجة الطلبات</h1>
-        <p>بوابة توظيف مواسم - مجموعة سييرا</p>
+      <div class="header-brand">
+        <img src="https://rwdrwcqkpljiopruhjty.supabase.co/storage/v1/object/public/uploads/1787625052832-a49c3d2b-ee78-41b8-a709-e832fb9d310c.jpeg" alt="شعار مجموعة سيرا ومواسم" class="panel-logo" />
+        <div class="header-title">
+          <h1>لوحة إدارة ومعالجة الطلبات</h1>
+          <p>شركة مجموعة سيرا القابضة | مواسم</p>
+        </div>
       </div>
       <div class="header-actions">
-        <button class="btn btn-primary" onclick="loadData()">تحديث القائمة</button>
-        <button class="btn btn-excel" onclick="exportToCSV()">تصدير كملف Excel</button>
-        <button class="btn btn-logout" onclick="logout()">تسجيل خروج</button>
+        <button class="btn btn-primary" onclick="loadData()">⟳ تحديث</button>
+        <button class="btn btn-excel" onclick="exportToCSV()">📊 تصدير Excel</button>
+        <button class="btn btn-logout" onclick="logout()">🚪 تسجيل خروج</button>
       </div>
     </header>
 
+    <!-- شريط الإحصائيات -->
     <div class="stats-bar">
       <div class="stat-card">
-        <div class="num" id="totalCount">0</div>
-        <div class="label">إجمالي الطلبات المستلمة</div>
+        <div class="stat-info">
+          <div class="num" id="totalCount">0</div>
+          <div class="label">إجمالي الطلبات</div>
+        </div>
+        <div class="stat-icon-wrap">📋</div>
       </div>
       <div class="stat-card">
-        <div class="num" id="todayCount">0</div>
-        <div class="label">طلبات اليوم</div>
+        <div class="stat-info">
+          <div class="num" id="todayCount">0</div>
+          <div class="label">طلبات اليوم</div>
+        </div>
+        <div class="stat-icon-wrap">⚡</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="num" id="nusukCount">0</div>
+          <div class="label">مسار بطائق نُسك</div>
+        </div>
+        <div class="stat-icon-wrap">🪪</div>
       </div>
     </div>
 
+    <!-- شريط الفلترة والبحث -->
     <div class="controls-bar">
       <div class="search-box">
-        <input type="text" id="searchInput" placeholder="بحث بالاسم، رقم الهوية، أو الجوال..." oninput="filterData()" />
+        <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم، رقم الهوية، أو رقم الجوال..." oninput="filterData()" />
       </div>
       <div class="filter-box">
         <select id="jobFilter" onchange="filterData()">
-          <option value="">جميع المسارات</option>
+          <option value="">جميع المسارات الوظيفية</option>
+          <option value="مسار بطائق نُسك">مسار بطائق نُسك</option>
           <option value="مسار القادة">مسار القادة</option>
           <option value="مسار الأمن والسلامة">مسار الأمن والسلامة</option>
           <option value="مسار الإسكان والإيواء">مسار الإسكان والإيواء</option>
@@ -385,6 +505,7 @@
       </div>
     </div>
 
+    <!-- جدول البيانات -->
     <div class="table-container">
       <table>
         <thead>
@@ -399,22 +520,46 @@
             <th>التخصص</th>
             <th>الهوية</th>
             <th>السيرة الذاتية</th>
-            <th>الوثيقة / المؤهل</th>
-            <th>شهادة الخبرة</th>
+            <th>وثيقة المؤهل</th>
+            <th>رخصة المسار</th>
             <th>إجراءات</th>
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="13" style="text-align:center; padding: 25px;">جاري تحميل البيانات...</td></tr>
+          <tr><td colspan="13" style="text-align:center; padding: 30px;">جاري تحميل البيانات...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    // كلمة المرور المعتمدة
     const ADMIN_PASS = "JSEah&b55";
     let rawApplications = [];
+
+    // تعريف الأشكال الهندسية والألوان الخاصة بكل مسار
+    const trackStyles = {
+      "مسار بطائق نُسك": { icon: "🪪", bg: "#ecfdf5", color: "#065f46" },
+      "مسار الأمن والسلامة": { icon: "🛡️", bg: "#eff6ff", color: "#1e40af" },
+      "مسار الإسكان والإيواء": { icon: "🏢", bg: "#f0fdfa", color: "#0f766e" },
+      "مسار الإعاشة": { icon: "🍱", bg: "#fffbeb", color: "#92400e" },
+      "مسار التجهيز والاستعداد المسبق": { icon: "⚙️", bg: "#f3f4f6", color: "#374151" },
+      "مسار التفويج": { icon: "🧭", bg: "#faf5ff", color: "#6b21a8" },
+      "مسار القادة": { icon: "🎖️", bg: "#fefce8", color: "#854d0e" },
+      "مسار النقل": { icon: "🚌", bg: "#eef2ff", color: "#3730a3" },
+      "مسار خدمات المشاعر": { icon: "🕋", bg: "#f0fdf4", color: "#166534" },
+      "مسار خدمة العملاء": { icon: "🎧", bg: "#fdf2f8", color: "#9d174d" }
+    };
+
+    function renderTrackBadge(trackName) {
+      if (!trackName) return "-";
+      const config = trackStyles[trackName] || { icon: "📌", bg: "#f1f5f9", color: "#475569" };
+      return `
+        <span class="track-badge" style="background-color: ${config.bg}; color: ${config.color}; border-color: ${config.color}20;">
+          <span class="track-shape">${config.icon}</span>
+          ${trackName}
+        </span>
+      `;
+    }
 
     function handleLogin(e) {
       e.preventDefault();
@@ -440,7 +585,6 @@
       window.location.reload();
     }
 
-    // التحقق من حالة الجلسة عند فتح الصفحة
     window.onload = function() {
       if (sessionStorage.getItem("admin_auth") === "true") {
         showAdminPanel();
@@ -453,11 +597,16 @@
         if (!res.ok) throw new Error("تعذر جلب البيانات");
 
         rawApplications = await res.json();
+        
+        // تحديث الإحصائيات
         document.getElementById("totalCount").innerText = rawApplications.length;
 
         const todayStr = new Date().toISOString().split("T")[0];
         const todayCount = rawApplications.filter(a => a.created_at && a.created_at.startsWith(todayStr)).length;
         document.getElementById("todayCount").innerText = todayCount;
+
+        const nusukCount = rawApplications.filter(a => a.job === "مسار بطائق نُسك").length;
+        document.getElementById("nusukCount").innerText = nusukCount;
 
         filterData();
       } catch (err) {
@@ -485,7 +634,7 @@
       tbody.innerHTML = "";
 
       if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding: 30px; color:#a0aec0;">لا توجد أي نتائج مطابقة.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding: 35px; color:#9ca3af; font-size:14px;">لا توجد أي نتائج مطابقة للبحث المحدد.</td></tr>`;
         return;
       }
 
@@ -493,20 +642,20 @@
         const getLink = (f, title) => {
           if (!f) return `<span class="empty-file">-</span>`;
           const href = f.startsWith("http") ? f : `/api/uploads/${f}`;
-          return `<a class="file-badge" href="${href}" target="_blank">${title}</a>`;
+          return `<a class="file-badge" href="${href}" target="_blank">📄 ${title}</a>`;
         };
 
-        const idLink = getLink(item.id_file, "عرض الهوية");
-        const cvLink = getLink(item.cv_file, "عرض السيرة");
-        const qualLink = getLink(item.qualification_file, "عرض المؤهل");
-        const expLink = getLink(item.experience_file, "عرض الخبرة");
+        const idLink = getLink(item.id_file, "الهوية");
+        const cvLink = getLink(item.cv_file, "السيرة");
+        const qualLink = getLink(item.qualification_file, "المؤهل");
+        const expLink = getLink(item.experience_file, "الرخصة");
 
         tbody.innerHTML += `
           <tr id="row-${item.id}">
             <td>${index + 1}</td>
             <td><strong>${item.full_name || "-"}</strong></td>
-            <td><span class="badge">${item.job || "-"}</span></td>
-            <td>${item.id_number || "-"}</td>
+            <td>${renderTrackBadge(item.job)}</td>
+            <td><code>${item.id_number || "-"}</code></td>
             <td>${item.phone || "-"}</td>
             <td>${item.city || "-"}</td>
             <td>${item.education || "-"}</td>
@@ -534,8 +683,7 @@
         if (!res.ok) throw new Error("فشل الحذف");
 
         rawApplications = rawApplications.filter(a => a.id !== id);
-        document.getElementById("totalCount").innerText = rawApplications.length;
-        filterData();
+        loadData();
       } catch (e) {
         alert("حدث خطأ أثناء محاولة حذف الطلب.");
         console.error(e);
@@ -552,7 +700,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Almosafer_Applications_${Date.now()}.csv`;
+      a.download = `Seera_Applications_${Date.now()}.csv`;
       a.click();
     }
   </script>
