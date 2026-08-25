@@ -121,7 +121,7 @@ app.post("/api/applications", (req, res) => {
         cv_file: cvFile,
         qualification_file: qualificationFile,
         experience_file: experienceFile,
-        status: "new"
+        status: "جديد"
       };
 
       const { data, error: dbError } = await supabase
@@ -155,6 +155,40 @@ app.post("/api/applications", (req, res) => {
   });
 });
 
+// مسار تسجيل دخول المشرفين والتحقق من الصلاحيات
+app.post("/api/admin/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ success: false, message: "يرجى إدخال اسم المستخدم وكلمة المرور" });
+    }
+
+    const { data: user, error } = await supabase
+      .from("admin_users")
+      .select("username, full_name, allowed_track")
+      .eq("username", username)
+      .eq("password", password)
+      .single();
+
+    if (error || !user) {
+      return res.status(401).json({ success: false, message: "بيانات الدخول غير صحيحة" });
+    }
+
+    return res.json({
+      success: true,
+      user: {
+        username: user.username,
+        name: user.full_name,
+        role: user.allowed_track
+      }
+    });
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(500).json({ success: false, message: "حدث خطأ في الخادم أثناء التحقق" });
+  }
+});
+
 // مسار جلب جميع الطلبات للوحة التحكم
 app.get("/api/admin/applications", async (req, res) => {
   try {
@@ -168,6 +202,50 @@ app.get("/api/admin/applications", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "فشل في جلب البيانات." });
+  }
+});
+
+// مسار تحديث حالة الطلب في قاعدة البيانات
+app.patch("/api/admin/applications/:id/status", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ success: false, message: "الحالة مطلوبة" });
+    }
+
+    const { data, error } = await supabase
+      .from("applications")
+      .update({ status })
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+
+    return res.json({ success: true, data });
+  } catch (err) {
+    console.error("Update status error:", err);
+    return res.status(500).json({ success: false, message: "فشل تحديث الحالة في قاعدة البيانات" });
+  }
+});
+
+// مسار حذف طلب من قاعدة البيانات
+app.delete("/api/admin/applications/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from("applications")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+
+    return res.json({ success: true, message: "تم حذف الطلب بنجاح" });
+  } catch (err) {
+    console.error("Delete application error:", err);
+    return res.status(500).json({ success: false, message: "فشل حذف الطلب" });
   }
 });
 
