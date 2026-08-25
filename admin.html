@@ -540,6 +540,13 @@
       "مسار خدمة العملاء": { shapeClass: "shape-diamond", color: "#9d174d", bg: "#fce7f3", border: "#fbcfe8" }
     };
 
+    function normalizeStatus(s) {
+      if (!s) return "جديد";
+      const clean = String(s).trim();
+      if (clean === "مقبول" || clean === "قيد المراجعة" || clean === "مرفوض") return clean;
+      return "جديد";
+    }
+
     function renderTrackBadge(name) {
       if (!name) return "-";
       const conf = trackConfig[name] || { shapeClass: "shape-circle", color: "#475569", bg: "#f1f5f9", border: "#e2e8f0" };
@@ -589,7 +596,7 @@
         
         rawApplications = data.map(app => ({
           ...app,
-          status: localStatuses[app.id] || app.status || "جديد"
+          status: normalizeStatus(localStatuses[app.id] || app.status)
         }));
 
         updateStats();
@@ -601,10 +608,10 @@
 
     function updateStats() {
       const total = rawApplications.length;
-      const newC = rawApplications.filter(a => a.status === "جديد").length;
-      const revC = rawApplications.filter(a => a.status === "قيد المراجعة").length;
-      const accC = rawApplications.filter(a => a.status === "مقبول").length;
-      const rejC = rawApplications.filter(a => a.status === "مرفوض").length;
+      const newC = rawApplications.filter(a => normalizeStatus(a.status) === "جديد").length;
+      const revC = rawApplications.filter(a => normalizeStatus(a.status) === "قيد المراجعة").length;
+      const accC = rawApplications.filter(a => normalizeStatus(a.status) === "مقبول").length;
+      const rejC = rawApplications.filter(a => normalizeStatus(a.status) === "مرفوض").length;
 
       document.getElementById("totalCount").innerText = total;
       document.getElementById("newCount").innerText = newC;
@@ -614,43 +621,47 @@
     }
 
     function updateStatus(id, newStatus, selectElem) {
+      const normalized = normalizeStatus(newStatus);
       const item = rawApplications.find(a => String(a.id) === String(id));
       if (item) {
-        item.status = newStatus;
+        item.status = normalized;
         const localStatuses = JSON.parse(localStorage.getItem("app_statuses") || "{}");
-        localStatuses[id] = newStatus;
+        localStatuses[id] = normalized;
         localStorage.setItem("app_statuses", JSON.stringify(localStatuses));
         
-        selectElem.className = `status-select status-${getStatusClass(newStatus)}`;
+        selectElem.className = `status-select status-${getStatusClass(normalized)}`;
         updateStats();
 
-        const currentStatusFilter = document.getElementById("statusFilter").value;
-        if (currentStatusFilter && currentStatusFilter !== newStatus) {
+        // إعادة تطبيق الفلترة في حال كانت قائمة الفلترة مفعلة
+        const currentFilter = document.getElementById("statusFilter").value.trim();
+        if (currentFilter) {
           filterData();
         }
       }
     }
 
     function getStatusClass(status) {
-      if (status === "مقبول") return "accepted";
-      if (status === "قيد المراجعة") return "review";
-      if (status === "مرفوض") return "rejected";
+      const s = normalizeStatus(status);
+      if (s === "مقبول") return "accepted";
+      if (s === "قيد المراجعة") return "review";
+      if (s === "مرفوض") return "rejected";
       return "new";
     }
 
-   function filterData() {
+    function filterData() {
       const q = document.getElementById("searchInput").value.trim().toLowerCase();
-      const job = document.getElementById("jobFilter").value;
-      const status = document.getElementById("statusFilter").value;
+      const job = document.getElementById("jobFilter").value.trim();
+      const selectedStatus = document.getElementById("statusFilter").value.trim();
 
       currentFiltered = rawApplications.filter(item => {
-        const itemStatus = item.status || "جديد";
+        const itemStatus = normalizeStatus(item.status);
 
         const matchQ = !q || (item.full_name && item.full_name.toLowerCase().includes(q)) ||
                               (item.id_number && item.id_number.includes(q)) ||
                               (item.phone && item.phone.includes(q));
+                              
         const matchJob = !job || item.job === job;
-        const matchStatus = !status || itemStatus === status;
+        const matchStatus = !selectedStatus || itemStatus === selectedStatus;
 
         return matchQ && matchJob && matchStatus;
       });
@@ -663,7 +674,7 @@
       tbody.innerHTML = "";
 
       if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding: 35px; color:#9ca3af;">لا توجد أي نتائج مطابقة.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding: 35px; color:#9ca3af; font-size:14px;">لا توجد أي طلبات مطابقة لمعايير البحث الحالية.</td></tr>`;
         return;
       }
 
@@ -674,7 +685,7 @@
           return `<a class="file-badge" href="${href}" target="_blank">📄 ${title}</a>`;
         };
 
-        const currentStatus = item.status || "جديد";
+        const currentStatus = normalizeStatus(item.status);
         const statusClass = `status-${getStatusClass(currentStatus)}`;
 
         tbody.innerHTML += `
@@ -779,7 +790,7 @@
             <td>${idx + 1}</td>
             <td style="text-align: right; font-weight: bold;">${r.full_name || '-'}</td>
             <td>${r.job || '-'}</td>
-            <td>${r.status || 'جديد'}</td>
+            <td>${normalizeStatus(r.status)}</td>
             <td>${r.id_number || '-'}</td>
             <td>${r.phone || '-'}</td>
             <td>${r.email || '-'}</td>
