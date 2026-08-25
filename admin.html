@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة إدارة الطلبات | مجموعة سيرا - مواسم</title>
+  <title>لوحة إدارة ومعالجة الطلبات | شركة مجموعة سيرا القابضة</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
@@ -19,12 +19,7 @@
       --text: #1f2937;
       --text-muted: #6b7280;
       --border: #e5e7eb;
-      --danger: #ef4444;
-      --danger-bg: #fee2e2;
-      --radius: 14px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08);
-      --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
+      --radius: 12px;
     }
 
     * {
@@ -37,19 +32,16 @@
     body {
       background: linear-gradient(135deg, #073b34 0%, #0c594f 100%);
       min-height: 100vh;
-      padding: 30px 15px;
+      padding: 25px 15px;
       color: var(--text);
     }
 
-    /* شاشة تسجيل الدخول */
+    /* تسجيل الدخول */
     #loginOverlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background: rgba(7, 59, 52, 0.95);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(8px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -60,93 +52,85 @@
     .login-card {
       background: #ffffff;
       width: 100%;
-      max-width: 420px;
-      padding: 40px 32px;
+      max-width: 400px;
+      padding: 35px 25px;
       border-radius: var(--radius);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
       text-align: center;
     }
 
     .login-logo {
-      width: 170px;
+      width: 160px;
       height: auto;
-      margin: 0 auto 18px auto;
+      margin: 0 auto 15px;
       display: block;
     }
 
     .login-card h2 {
       color: var(--primary);
-      font-size: 21px;
+      font-size: 20px;
       font-weight: 800;
       margin-bottom: 6px;
     }
 
     .login-card p {
       color: var(--text-muted);
-      font-size: 13.5px;
-      margin-bottom: 25px;
+      font-size: 13px;
+      margin-bottom: 20px;
     }
 
     .login-input {
       width: 100%;
-      padding: 13px 16px;
+      padding: 12px;
       border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-size: 14.5px;
+      border-radius: 8px;
+      font-size: 14px;
       outline: none;
       margin-bottom: 15px;
       text-align: center;
       letter-spacing: 2px;
       background: #f9fafb;
-      transition: all 0.2s ease;
     }
 
     .login-input:focus {
       border-color: var(--primary);
       background: #fff;
-      box-shadow: 0 0 0 3px rgba(12, 89, 79, 0.15);
     }
 
     .btn-login {
       width: 100%;
-      padding: 13px;
+      padding: 12px;
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-login:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
     }
 
     .login-error {
-      color: var(--danger);
-      font-size: 13px;
+      color: #dc2626;
+      font-size: 12.5px;
       font-weight: 600;
-      margin-top: 12px;
+      margin-top: 10px;
       display: none;
     }
 
-    /* لوحة التحكم الرئيسية */
+    /* الحاوية الرئيسية */
     .container {
-      max-width: 1600px;
+      max-width: 1650px;
       margin: 0 auto;
       background: var(--card-bg);
       border-radius: var(--radius);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
       overflow: hidden;
       display: none;
     }
 
     .header {
       background: #ffffff;
-      padding: 24px 32px;
+      padding: 20px 30px;
       border-bottom: 3px solid var(--primary);
       display: flex;
       justify-content: space-between;
@@ -158,114 +142,105 @@
     .header-brand {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 15px;
     }
 
     .panel-logo {
-      height: 48px;
+      height: 44px;
       width: auto;
-      object-fit: contain;
     }
 
     .header-title h1 {
-      font-size: 21px;
+      font-size: 20px;
       font-weight: 800;
       color: var(--primary);
     }
 
     .header-title p {
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--text-muted);
-      margin-top: 3px;
-      font-weight: 500;
+      margin-top: 2px;
     }
 
     .header-actions {
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .btn {
-      padding: 10px 18px;
-      border-radius: 9px;
-      font-size: 13.5px;
+      padding: 9px 15px;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       border: none;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
+      gap: 6px;
+      transition: all 0.2s;
     }
 
     .btn-primary { background: var(--primary); color: white; }
     .btn-primary:hover { background: var(--primary-hover); }
-
     .btn-excel { background: #059669; color: white; }
-    .btn-excel:hover { background: #047857; }
-
     .btn-logout { background: #f8fafc; color: var(--text-muted); border: 1px solid var(--border); }
-    .btn-logout:hover { background: #fee2e2; color: var(--danger); border-color: #fca5a5; }
+    .btn-logout:hover { background: #fee2e2; color: #dc2626; }
 
-    /* بطاقات الإحصائيات */
-    .stats-bar {
+    /* بطاقات الحالات العلوية */
+    .stats-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 16px;
-      padding: 20px 32px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      padding: 20px 30px;
       background: #f8fafc;
       border-bottom: 1px solid var(--border);
     }
 
     .stat-card {
-      background: white;
+      background: #ffffff;
       padding: 16px 20px;
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
     .stat-info .num {
       font-size: 24px;
       font-weight: 800;
-      color: var(--primary);
-      line-height: 1.2;
+      color: #1f2937;
     }
 
     .stat-info .label {
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--text-muted);
       font-weight: 600;
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
-    .stat-icon-wrap {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
+    .stat-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      background: var(--primary-light);
-      color: var(--primary);
+      font-size: 18px;
     }
 
-    /* شريط البحث والفلترة */
+    .icon-total { background: #e6f4ea; color: #0c594f; }
+    .icon-new { background: #e0f2fe; color: #0284c7; }
+    .icon-review { background: #fef3c7; color: #d97706; }
+    .icon-accepted { background: #dcfce7; color: #16a34a; }
+    .icon-rejected { background: #fee2e2; color: #dc2626; }
+
+    /* التحكم والفلترة */
     .controls-bar {
-      padding: 18px 32px;
+      padding: 16px 30px;
       display: flex;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
       background: white;
       border-bottom: 1px solid var(--border);
@@ -274,55 +249,46 @@
 
     .search-box {
       flex: 1;
-      min-width: 280px;
-      position: relative;
+      min-width: 260px;
     }
 
     .search-box input {
       width: 100%;
-      padding: 11px 16px;
+      padding: 10px 14px;
       border: 1.5px solid var(--border);
-      border-radius: 9px;
-      outline: none;
+      border-radius: 8px;
       font-size: 13.5px;
+      outline: none;
       background: #f9fafb;
-      transition: all 0.2s;
     }
 
     .search-box input:focus {
       border-color: var(--primary);
       background: #fff;
-      box-shadow: 0 0 0 3px rgba(12, 89, 79, 0.12);
     }
 
     .filter-box select {
-      padding: 11px 16px;
+      padding: 10px 14px;
       border: 1.5px solid var(--border);
-      border-radius: 9px;
-      outline: none;
-      font-size: 13.5px;
-      background: #f9fafb;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text);
+      outline: none;
+      background: #f9fafb;
       cursor: pointer;
     }
 
-    .filter-box select:focus {
-      border-color: var(--primary);
-      background: #fff;
-    }
-
-    /* جدول المتقدمين */
+    /* الجدول */
     .table-container {
-      padding: 10px 32px 32px;
+      padding: 10px 30px 30px;
       overflow-x: auto;
-      max-height: 720px;
+      max-height: 700px;
     }
 
     table {
       width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
+      border-collapse: collapse;
       text-align: right;
     }
 
@@ -330,8 +296,8 @@
       background: #f8fafc;
       color: var(--primary);
       font-weight: 800;
-      font-size: 13px;
-      padding: 14px 12px;
+      font-size: 12.5px;
+      padding: 12px 10px;
       border-bottom: 2px solid var(--border);
       position: sticky;
       top: 0;
@@ -340,99 +306,98 @@
     }
 
     td {
-      padding: 14px 12px;
+      padding: 12px 10px;
       border-bottom: 1px solid var(--border);
-      font-size: 13px;
+      font-size: 12.5px;
       white-space: nowrap;
       vertical-align: middle;
-    }
-
-    tbody tr {
-      transition: background-color 0.15s ease;
     }
 
     tbody tr:hover {
       background: #f9fafb;
     }
 
-    /* الشارات الهندسية للمسارات الوظيفية */
+    /* شارات المسارات والأشكال الهندسية */
     .track-badge {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 5px 12px;
-      border-radius: 8px;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
       font-size: 12px;
       font-weight: 700;
-      white-space: nowrap;
-      border: 1px solid rgba(0, 0, 0, 0.06);
+      border: 1px solid transparent;
     }
 
-    .track-shape {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
-      font-size: 11px;
+    .geo-shape {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
     }
 
-    /* أزرار الملفات والإجراءات */
+    .shape-circle { border-radius: 50% !important; }
+    .shape-diamond { transform: rotate(45deg); border-radius: 2px; }
+    .shape-triangle {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 12px solid currentColor;
+      background: transparent !important;
+    }
+
+    /* القوائم المنسدلة لحالة الطلب */
+    .status-select {
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .status-new { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    .status-review { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    .status-accepted { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .status-rejected { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+
+    /* الملفات */
     .file-badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 5px 10px;
-      border-radius: 7px;
-      font-size: 12px;
+      gap: 3px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
       font-weight: 700;
       text-decoration: none;
       background: #eff6ff;
       color: #2563eb;
       border: 1px solid #bfdbfe;
-      transition: all 0.2s ease;
-    }
-
-    .file-badge:hover {
-      background: #2563eb;
-      color: #fff;
-      transform: translateY(-1px);
     }
 
     .btn-delete {
-      background: var(--danger-bg);
-      color: var(--danger);
+      background: #fee2e2;
+      color: #dc2626;
       border: 1px solid #fca5a5;
-      padding: 6px 12px;
-      border-radius: 7px;
+      padding: 4px 8px;
+      border-radius: 6px;
       cursor: pointer;
       font-weight: 700;
-      font-size: 12px;
-      transition: 0.2s;
-    }
-
-    .btn-delete:hover {
-      background: var(--danger);
-      color: white;
-    }
-
-    .empty-file {
-      color: #cbd5e1;
-      font-weight: bold;
-      text-align: center;
-      display: block;
+      font-size: 11.5px;
     }
   </style>
 </head>
 <body>
 
-  <!-- شاشة الدخول المقفلة بكلمة المرور -->
+  <!-- شاشة الدخول -->
   <div id="loginOverlay">
     <div class="login-card">
       <img src="https://rwdrwcqkpljiopruhjty.supabase.co/storage/v1/object/public/uploads/1787625052832-a49c3d2b-ee78-41b8-a709-e832fb9d310c.jpeg" alt="مجموعة سيرا" class="login-logo" />
       <h2>بوابة الإدارة المركزية</h2>
-      <p>يرجى إدخال كلمة المرور المعتمدة للوصول للوحة الطلبات</p>
+      <p>يرجى إدخال كلمة المرور المعتمدة</p>
       <form onsubmit="handleLogin(event)">
         <input type="password" id="adminPassword" class="login-input" placeholder="كلمة المرور..." autofocus autocomplete="off" />
         <button type="submit" class="btn-login">دخول النظام</button>
@@ -441,11 +406,11 @@
     </div>
   </div>
 
-  <!-- لوحة التحكم الرئيسية -->
+  <!-- لوحة التحكم -->
   <div class="container" id="adminPanel">
     <header class="header">
       <div class="header-brand">
-        <img src="https://rwdrwcqkpljiopruhjty.supabase.co/storage/v1/object/public/uploads/1787625052832-a49c3d2b-ee78-41b8-a709-e832fb9d310c.jpeg" alt="شعار مجموعة سيرا ومواسم" class="panel-logo" />
+        <img src="https://rwdrwcqkpljiopruhjty.supabase.co/storage/v1/object/public/uploads/1787625052832-a49c3d2b-ee78-41b8-a709-e832fb9d310c.jpeg" alt="شعار مجموعة سيرا" class="panel-logo" />
         <div class="header-title">
           <h1>لوحة إدارة ومعالجة الطلبات</h1>
           <p>شركة مجموعة سيرا القابضة | مواسم</p>
@@ -454,39 +419,62 @@
       <div class="header-actions">
         <button class="btn btn-primary" onclick="loadData()">⟳ تحديث</button>
         <button class="btn btn-excel" onclick="exportToCSV()">📊 تصدير Excel</button>
-        <button class="btn btn-logout" onclick="logout()">🚪 تسجيل خروج</button>
+        <button class="btn btn-logout" onclick="logout()">🚪 خروج</button>
       </div>
     </header>
 
-    <!-- شريط الإحصائيات -->
-    <div class="stats-bar">
+    <!-- بطاقات الحالات العلوية الخمسة -->
+    <div class="stats-container">
       <div class="stat-card">
         <div class="stat-info">
           <div class="num" id="totalCount">0</div>
           <div class="label">إجمالي الطلبات</div>
         </div>
-        <div class="stat-icon-wrap">📋</div>
+        <div class="stat-icon icon-total">👥</div>
       </div>
       <div class="stat-card">
         <div class="stat-info">
-          <div class="num" id="todayCount">0</div>
-          <div class="label">طلبات اليوم</div>
+          <div class="num" id="newCount">0</div>
+          <div class="label">طلبات جديدة</div>
         </div>
-        <div class="stat-icon-wrap">⚡</div>
+        <div class="stat-icon icon-new">🆕</div>
       </div>
       <div class="stat-card">
         <div class="stat-info">
-          <div class="num" id="nusukCount">0</div>
-          <div class="label">مسار بطائق نُسك</div>
+          <div class="num" id="reviewCount">0</div>
+          <div class="label">قيد المراجعة</div>
         </div>
-        <div class="stat-icon-wrap">🪪</div>
+        <div class="stat-icon icon-review">⏳</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="num" id="acceptedCount">0</div>
+          <div class="label">المقبولين</div>
+        </div>
+        <div class="stat-icon icon-accepted">✅</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="num" id="rejectedCount">0</div>
+          <div class="label">المرفوضين</div>
+        </div>
+        <div class="stat-icon icon-rejected">❌</div>
       </div>
     </div>
 
-    <!-- شريط الفلترة والبحث -->
+    <!-- شريط البحث والفلترة -->
     <div class="controls-bar">
       <div class="search-box">
-        <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم، رقم الهوية، أو رقم الجوال..." oninput="filterData()" />
+        <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم، رقم الهوية، أو الجوال..." oninput="filterData()" />
+      </div>
+      <div class="filter-box">
+        <select id="statusFilter" onchange="filterData()">
+          <option value="">جميع الحالات</option>
+          <option value="جديد">جديد</option>
+          <option value="قيد المراجعة">قيد المراجعة</option>
+          <option value="مقبول">مقبول</option>
+          <option value="مرفوض">مرفوض</option>
+        </select>
       </div>
       <div class="filter-box">
         <select id="jobFilter" onchange="filterData()">
@@ -505,7 +493,7 @@
       </div>
     </div>
 
-    <!-- جدول البيانات -->
+    <!-- الجدول -->
     <div class="table-container">
       <table>
         <thead>
@@ -513,20 +501,21 @@
             <th>#</th>
             <th>الاسم الرباعي</th>
             <th>المسار المطلوب</th>
-            <th>رقم الهوية / الإقامة</th>
+            <th>حالة الطلب</th>
+            <th>الهوية / الإقامة</th>
             <th>الجوال</th>
             <th>المدينة</th>
             <th>المؤهل</th>
             <th>التخصص</th>
             <th>الهوية</th>
-            <th>السيرة الذاتية</th>
-            <th>وثيقة المؤهل</th>
+            <th>السيرة</th>
+            <th>المؤهل</th>
             <th>رخصة المسار</th>
             <th>إجراءات</th>
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="13" style="text-align:center; padding: 30px;">جاري تحميل البيانات...</td></tr>
+          <tr><td colspan="14" style="text-align:center; padding: 30px;">جاري تحميل البيانات...</td></tr>
         </tbody>
       </table>
     </div>
@@ -536,27 +525,27 @@
     const ADMIN_PASS = "JSEah&b55";
     let rawApplications = [];
 
-    // تعريف الأشكال الهندسية والألوان الخاصة بكل مسار
-    const trackStyles = {
-      "مسار بطائق نُسك": { icon: "🪪", bg: "#ecfdf5", color: "#065f46" },
-      "مسار الأمن والسلامة": { icon: "🛡️", bg: "#eff6ff", color: "#1e40af" },
-      "مسار الإسكان والإيواء": { icon: "🏢", bg: "#f0fdfa", color: "#0f766e" },
-      "مسار الإعاشة": { icon: "🍱", bg: "#fffbeb", color: "#92400e" },
-      "مسار التجهيز والاستعداد المسبق": { icon: "⚙️", bg: "#f3f4f6", color: "#374151" },
-      "مسار التفويج": { icon: "🧭", bg: "#faf5ff", color: "#6b21a8" },
-      "مسار القادة": { icon: "🎖️", bg: "#fefce8", color: "#854d0e" },
-      "مسار النقل": { icon: "🚌", bg: "#eef2ff", color: "#3730a3" },
-      "مسار خدمات المشاعر": { icon: "🕋", bg: "#f0fdf4", color: "#166534" },
-      "مسار خدمة العملاء": { icon: "🎧", bg: "#fdf2f8", color: "#9d174d" }
+    // قاموس الأشكال الهندسية والألوان لكل مسار
+    const trackConfig = {
+      "مسار بطائق نُسك": { shapeClass: "shape-circle", color: "#0c594f", bg: "#e6f4ea", border: "#a7f3d0" },
+      "مسار الأمن والسلامة": { shapeClass: "geo-shape", color: "#1e40af", bg: "#dbeafe", border: "#bfdbfe" },
+      "مسار الإسكان والإيواء": { shapeClass: "shape-diamond", color: "#0f766e", bg: "#ccfbf1", border: "#99f6e4" },
+      "مسار الإعاشة": { shapeClass: "shape-circle", color: "#b45309", bg: "#fef3c7", border: "#fde68a" },
+      "مسار التجهيز والاستعداد المسبق": { shapeClass: "geo-shape", color: "#374151", bg: "#f3f4f6", border: "#e5e7eb" },
+      "مسار التفويج": { shapeClass: "shape-diamond", color: "#6b21a8", bg: "#f3e8ff", border: "#e9d5ff" },
+      "مسار القادة": { shapeClass: "shape-triangle", color: "#854d0e", bg: "#fef9c3", border: "#fef08a" },
+      "مسار النقل": { shapeClass: "shape-circle", color: "#3730a3", bg: "#e0e7ff", border: "#c7d2fe" },
+      "مسار خدمات المشاعر": { shapeClass: "geo-shape", color: "#166534", bg: "#dcfce7", border: "#bbf7d0" },
+      "مسار خدمة العملاء": { shapeClass: "shape-diamond", color: "#9d174d", bg: "#fce7f3", border: "#fbcfe8" }
     };
 
-    function renderTrackBadge(trackName) {
-      if (!trackName) return "-";
-      const config = trackStyles[trackName] || { icon: "📌", bg: "#f1f5f9", color: "#475569" };
+    function renderTrackBadge(name) {
+      if (!name) return "-";
+      const conf = trackConfig[name] || { shapeClass: "shape-circle", color: "#475569", bg: "#f1f5f9", border: "#e2e8f0" };
       return `
-        <span class="track-badge" style="background-color: ${config.bg}; color: ${config.color}; border-color: ${config.color}20;">
-          <span class="track-shape">${config.icon}</span>
-          ${trackName}
+        <span class="track-badge" style="background:${conf.bg}; color:${conf.color}; border-color:${conf.border};">
+          <span class="geo-shape ${conf.shapeClass}" style="background-color:${conf.color}; color:${conf.color};"></span>
+          ${name}
         </span>
       `;
     }
@@ -564,13 +553,11 @@
     function handleLogin(e) {
       e.preventDefault();
       const enteredPass = document.getElementById("adminPassword").value.trim();
-      const errBox = document.getElementById("loginError");
-
       if (enteredPass === ADMIN_PASS) {
         sessionStorage.setItem("admin_auth", "true");
         showAdminPanel();
       } else {
-        errBox.style.display = "block";
+        document.getElementById("loginError").style.display = "block";
       }
     }
 
@@ -596,34 +583,53 @@
         const res = await fetch("/api/admin/applications");
         if (!res.ok) throw new Error("تعذر جلب البيانات");
 
-        rawApplications = await res.json();
-        
-        // تحديث الإحصائيات
-        document.getElementById("totalCount").innerText = rawApplications.length;
+        const data = await res.json();
+        // إسناد الحالة المحفوظة محلياً أو الافتراضية
+        const localStatuses = JSON.parse(localStorage.getItem("app_statuses") || "{}");
+        rawApplications = data.map(app => ({
+          ...app,
+          status: localStatuses[app.id] || app.status || "جديد"
+        }));
 
-        const todayStr = new Date().toISOString().split("T")[0];
-        const todayCount = rawApplications.filter(a => a.created_at && a.created_at.startsWith(todayStr)).length;
-        document.getElementById("todayCount").innerText = todayCount;
-
-        const nusukCount = rawApplications.filter(a => a.job === "مسار بطائق نُسك").length;
-        document.getElementById("nusukCount").innerText = nusukCount;
-
+        updateStats();
         filterData();
       } catch (err) {
-        document.getElementById("tableBody").innerHTML = `<tr><td colspan="13" style="text-align:center; color:red; padding: 25px;">تعذر الاتصال بقاعدة البيانات.</td></tr>`;
+        document.getElementById("tableBody").innerHTML = `<tr><td colspan="14" style="text-align:center; color:red; padding: 25px;">تعذر الاتصال بقاعدة البيانات.</td></tr>`;
+      }
+    }
+
+    function updateStats() {
+      document.getElementById("totalCount").innerText = rawApplications.length;
+      document.getElementById("newCount").innerText = rawApplications.filter(a => a.status === "جديد").length;
+      document.getElementById("reviewCount").innerText = rawApplications.filter(a => a.status === "قيد المراجعة").length;
+      document.getElementById("acceptedCount").innerText = rawApplications.filter(a => a.status === "مقبول").length;
+      document.getElementById("rejectedCount").innerText = rawApplications.filter(a => a.status === "مرفوض").length;
+    }
+
+    function updateStatus(id, newStatus) {
+      const item = rawApplications.find(a => a.id === id);
+      if (item) {
+        item.status = newStatus;
+        const localStatuses = JSON.parse(localStorage.getItem("app_statuses") || "{}");
+        localStatuses[id] = newStatus;
+        localStorage.setItem("app_statuses", JSON.stringify(localStatuses));
+        updateStats();
+        filterData();
       }
     }
 
     function filterData() {
       const q = document.getElementById("searchInput").value.trim().toLowerCase();
       const job = document.getElementById("jobFilter").value;
+      const status = document.getElementById("statusFilter").value;
 
       const filtered = rawApplications.filter(item => {
         const matchQ = !q || (item.full_name && item.full_name.toLowerCase().includes(q)) ||
                               (item.id_number && item.id_number.includes(q)) ||
                               (item.phone && item.phone.includes(q));
         const matchJob = !job || item.job === job;
-        return matchQ && matchJob;
+        const matchStatus = !status || item.status === status;
+        return matchQ && matchJob && matchStatus;
       });
 
       renderRows(filtered);
@@ -634,36 +640,46 @@
       tbody.innerHTML = "";
 
       if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding: 35px; color:#9ca3af; font-size:14px;">لا توجد أي نتائج مطابقة للبحث المحدد.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding: 35px; color:#9ca3af;">لا توجد أي نتائج مطابقة.</td></tr>`;
         return;
       }
 
       items.forEach((item, index) => {
         const getLink = (f, title) => {
-          if (!f) return `<span class="empty-file">-</span>`;
+          if (!f) return `<span style="color:#cbd5e1">-</span>`;
           const href = f.startsWith("http") ? f : `/api/uploads/${f}`;
           return `<a class="file-badge" href="${href}" target="_blank">📄 ${title}</a>`;
         };
 
-        const idLink = getLink(item.id_file, "الهوية");
-        const cvLink = getLink(item.cv_file, "السيرة");
-        const qualLink = getLink(item.qualification_file, "المؤهل");
-        const expLink = getLink(item.experience_file, "الرخصة");
+        const statusClass = {
+          "جديد": "status-new",
+          "قيد المراجعة": "status-review",
+          "مقبول": "status-accepted",
+          "مرفوض": "status-rejected"
+        }[item.status] || "status-new";
 
         tbody.innerHTML += `
           <tr id="row-${item.id}">
             <td>${index + 1}</td>
             <td><strong>${item.full_name || "-"}</strong></td>
             <td>${renderTrackBadge(item.job)}</td>
+            <td>
+              <select class="status-select ${statusClass}" onchange="updateStatus('${item.id}', this.value)">
+                <option value="جديد" ${item.status === 'جديد' ? 'selected' : ''}>جديد</option>
+                <option value="قيد المراجعة" ${item.status === 'قيد المراجعة' ? 'selected' : ''}>قيد المراجعة</option>
+                <option value="مقبول" ${item.status === 'مقبول' ? 'selected' : ''}>مقبول</option>
+                <option value="مرفوض" ${item.status === 'مرفوض' ? 'selected' : ''}>مرفوض</option>
+              </select>
+            </td>
             <td><code>${item.id_number || "-"}</code></td>
             <td>${item.phone || "-"}</td>
             <td>${item.city || "-"}</td>
             <td>${item.education || "-"}</td>
             <td>${item.major || "بدون"}</td>
-            <td>${idLink}</td>
-            <td>${cvLink}</td>
-            <td>${qualLink}</td>
-            <td>${expLink}</td>
+            <td>${getLink(item.id_file, "الهوية")}</td>
+            <td>${getLink(item.cv_file, "السيرة")}</td>
+            <td>${getLink(item.qualification_file, "المؤهل")}</td>
+            <td>${getLink(item.experience_file, "الرخصة")}</td>
             <td>
               <button class="btn-delete" onclick="deleteApp('${item.id}')">حذف</button>
             </td>
@@ -676,25 +692,22 @@
       if (!confirm("هل أنت متأكد من رغبتك في حذف هذا الطلب نهائياً؟")) return;
 
       try {
-        const res = await fetch(`/api/admin/applications/${id}`, {
-          method: "DELETE"
-        });
-
+        const res = await fetch(`/api/admin/applications/${id}`, { method: "DELETE" });
         if (!res.ok) throw new Error("فشل الحذف");
 
         rawApplications = rawApplications.filter(a => a.id !== id);
-        loadData();
+        updateStats();
+        filterData();
       } catch (e) {
         alert("حدث خطأ أثناء محاولة حذف الطلب.");
-        console.error(e);
       }
     }
 
     function exportToCSV() {
       if (!rawApplications.length) return alert("لا توجد بيانات لتصديرها");
-      let csv = "\uFEFFالاسم,المسار,الهوية,الجوال,البريد,المدينة,المؤهل,التخصص,الخبرة\n";
+      let csv = "\uFEFFالاسم,المسار,الحالة,الهوية,الجوال,البريد,المدينة,المؤهل,التخصص\n";
       rawApplications.forEach(r => {
-        csv += `"${r.full_name}","${r.job}","${r.id_number}","${r.phone}","${r.email}","${r.city}","${r.education}","${r.major}","${r.experience}"\n`;
+        csv += `"${r.full_name}","${r.job}","${r.status}","${r.id_number}","${r.phone}","${r.email}","${r.city}","${r.education}","${r.major}"\n`;
       });
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
