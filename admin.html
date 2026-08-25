@@ -418,7 +418,7 @@
       </div>
       <div class="header-actions">
         <button class="btn btn-primary" onclick="loadData()">⟳ تحديث</button>
-        <button class="btn btn-excel" onclick="exportToCSV()">📊 تصدير Excel</button>
+        <button class="btn btn-excel" onclick="exportToExcel()">📊 تصدير Excel</button>
         <button class="btn btn-logout" onclick="logout()">🚪 خروج</button>
       </div>
     </header>
@@ -524,6 +524,7 @@
   <script>
     const ADMIN_PASS = "JSEah&b55";
     let rawApplications = [];
+    let currentFiltered = [];
 
     // قاموس الأشكال الهندسية والألوان لكل مسار
     const trackConfig = {
@@ -620,9 +621,7 @@
         localStatuses[id] = newStatus;
         localStorage.setItem("app_statuses", JSON.stringify(localStatuses));
         
-        // تحديث لون القائمة فورياً
         selectElem.className = `status-select status-${getStatusClass(newStatus)}`;
-        
         updateStats();
 
         const currentStatusFilter = document.getElementById("statusFilter").value;
@@ -644,7 +643,7 @@
       const job = document.getElementById("jobFilter").value;
       const status = document.getElementById("statusFilter").value;
 
-      const filtered = rawApplications.filter(item => {
+      currentFiltered = rawApplications.filter(item => {
         const matchQ = !q || (item.full_name && item.full_name.toLowerCase().includes(q)) ||
                               (item.id_number && item.id_number.includes(q)) ||
                               (item.phone && item.phone.includes(q));
@@ -653,7 +652,7 @@
         return matchQ && matchJob && matchStatus;
       });
 
-      renderRows(filtered);
+      renderRows(currentFiltered);
     }
 
     function renderRows(items) {
@@ -720,18 +719,91 @@
       }
     }
 
-    function exportToCSV() {
-      if (!rawApplications.length) return alert("لا توجد بيانات لتصديرها");
-      let csv = "\uFEFFالاسم,المسار,الحالة,الهوية,الجوال,البريد,المدينة,المؤهل,التخصص\n";
-      rawApplications.forEach(r => {
-        csv += `"${r.full_name}","${r.job}","${r.status}","${r.id_number}","${r.phone}","${r.email}","${r.city}","${r.education}","${r.major}"\n`;
+    function exportToExcel() {
+      const dataToExport = currentFiltered.length ? currentFiltered : rawApplications;
+      if (!dataToExport.length) return alert("لا توجد بيانات مطابقة لتصديرها!");
+
+      let excelContent = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+              xmlns:x="urn:schemas-microsoft-com:office:excel" 
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+          <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
+          <style>
+            table { border-collapse: collapse; direction: rtl; font-family: 'Segoe UI', Tahoma, sans-serif; }
+            th { 
+              background-color: #0c594f; 
+              color: #ffffff; 
+              font-weight: bold; 
+              font-size: 12pt; 
+              border: 1px solid #000000; 
+              padding: 10px 14px; 
+              text-align: center;
+            }
+            td { 
+              border: 1px solid #d1d5db; 
+              padding: 8px 12px; 
+              text-align: center; 
+              font-size: 11pt;
+              mso-number-format: "\\@";
+            }
+            tr:nth-child(even) { background-color: #f9fafb; }
+          </style>
+        </head>
+        <body>
+          <table border="1">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th style="width: 220px;">الاسم الرباعي</th>
+                <th style="width: 180px;">المسار المطلوب</th>
+                <th style="width: 130px;">حالة الطلب</th>
+                <th style="width: 150px;">رقم الهوية / الإقامة</th>
+                <th style="width: 140px;">رقم الجوال</th>
+                <th style="width: 200px;">البريد الإلكتروني</th>
+                <th style="width: 130px;">المدينة</th>
+                <th style="width: 130px;">المؤهل</th>
+                <th style="width: 160px;">التخصص</th>
+                <th style="width: 110px;">سنوات الخبرة</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      dataToExport.forEach((r, idx) => {
+        excelContent += `
+          <tr>
+            <td>${idx + 1}</td>
+            <td style="text-align: right; font-weight: bold;">${r.full_name || '-'}</td>
+            <td>${r.job || '-'}</td>
+            <td>${r.status || 'جديد'}</td>
+            <td>${r.id_number || '-'}</td>
+            <td>${r.phone || '-'}</td>
+            <td>${r.email || '-'}</td>
+            <td>${r.city || '-'}</td>
+            <td>${r.education || '-'}</td>
+            <td>${r.major || 'بدون'}</td>
+            <td>${r.experience || '0'}</td>
+          </tr>
+        `;
       });
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+      excelContent += `
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob([excelContent], { type: "application/vnd.ms-excel;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Seera_Applications_${Date.now()}.csv`;
+      a.download = `Seera_Applications_${Date.now()}.xls`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
   </script>
 </body>
