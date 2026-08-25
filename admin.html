@@ -638,17 +638,20 @@
       return "new";
     }
 
-    function filterData() {
+   function filterData() {
       const q = document.getElementById("searchInput").value.trim().toLowerCase();
       const job = document.getElementById("jobFilter").value;
       const status = document.getElementById("statusFilter").value;
 
       currentFiltered = rawApplications.filter(item => {
+        const itemStatus = item.status || "جديد";
+
         const matchQ = !q || (item.full_name && item.full_name.toLowerCase().includes(q)) ||
                               (item.id_number && item.id_number.includes(q)) ||
                               (item.phone && item.phone.includes(q));
         const matchJob = !job || item.job === job;
-        const matchStatus = !status || item.status === status;
+        const matchStatus = !status || itemStatus === status;
+
         return matchQ && matchJob && matchStatus;
       });
 
