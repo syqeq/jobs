@@ -52,8 +52,8 @@
     .login-card {
       background: #ffffff;
       width: 100%;
-      max-width: 400px;
-      padding: 35px 25px;
+      max-width: 420px;
+      padding: 35px 28px;
       border-radius: var(--radius);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
       text-align: center;
@@ -86,9 +86,8 @@
       border-radius: 8px;
       font-size: 14px;
       outline: none;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       text-align: center;
-      letter-spacing: 2px;
       background: #f9fafb;
     }
 
@@ -107,6 +106,12 @@
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
+      margin-top: 5px;
+      transition: 0.2s;
+    }
+
+    .btn-login:hover {
+      background: var(--primary-hover);
     }
 
     .login-error {
@@ -162,6 +167,19 @@
       margin-top: 2px;
     }
 
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 4px;
+    }
+
     .header-actions {
       display: flex;
       gap: 8px;
@@ -186,7 +204,7 @@
     .btn-logout { background: #f8fafc; color: var(--text-muted); border: 1px solid var(--border); }
     .btn-logout:hover { background: #fee2e2; color: #dc2626; }
 
-    /* بطاقات الحالات العلوية الخمسة */
+    /* بطاقات الحالات */
     .stats-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -279,6 +297,12 @@
       cursor: pointer;
     }
 
+    .filter-box select:disabled {
+      background: #e2e8f0;
+      cursor: not-allowed;
+      color: #64748b;
+    }
+
     /* الجدول */
     .table-container {
       padding: 10px 30px 30px;
@@ -317,7 +341,6 @@
       background: #f9fafb;
     }
 
-    /* شارات المسارات والأشكال الهندسية */
     .track-badge {
       display: inline-flex;
       align-items: center;
@@ -347,7 +370,6 @@
       background: transparent !important;
     }
 
-    /* القوائم المنسدلة لحالة الطلب */
     .status-select {
       padding: 5px 8px;
       border-radius: 6px;
@@ -363,7 +385,6 @@
     .status-accepted { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
     .status-rejected { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
 
-    /* الملفات */
     .file-badge {
       display: inline-flex;
       align-items: center;
@@ -397,11 +418,12 @@
     <div class="login-card">
       <img src="https://rwdrwcqkpljiopruhjty.supabase.co/storage/v1/object/public/uploads/1787625052832-a49c3d2b-ee78-41b8-a709-e832fb9d310c.jpeg" alt="مجموعة سيرا" class="login-logo" />
       <h2>بوابة الإدارة المركزية</h2>
-      <p>يرجى إدخال كلمة المرور المعتمدة</p>
+      <p>تسجيل دخول المشرفين ورؤساء المسارات</p>
       <form onsubmit="handleLogin(event)">
-        <input type="password" id="adminPassword" class="login-input" placeholder="كلمة المرور..." autofocus autocomplete="off" />
+        <input type="text" id="adminUsername" class="login-input" placeholder="اسم المستخدم..." autofocus autocomplete="off" />
+        <input type="password" id="adminPassword" class="login-input" placeholder="كلمة المرور..." autocomplete="off" />
         <button type="submit" class="btn-login">دخول النظام</button>
-        <div id="loginError" class="login-error">كلمة المرور غير صحيحة، يرجى المحاولة ثانية.</div>
+        <div id="loginError" class="login-error">بيانات الدخول غير صحيحة، يرجى المحاولة ثانية.</div>
       </form>
     </div>
   </div>
@@ -414,6 +436,7 @@
         <div class="header-title">
           <h1>لوحة إدارة ومعالجة الطلبات</h1>
           <p>شركة مجموعة سيرا القابضة | مواسم</p>
+          <div class="user-pill" id="currentUserBadge">👤 المستخدم: المدير العام</div>
         </div>
       </div>
       <div class="header-actions">
@@ -423,7 +446,7 @@
       </div>
     </header>
 
-    <!-- بطاقات الحالات العلوية الخمسة -->
+    <!-- بطاقات الحالات -->
     <div class="stats-container">
       <div class="stat-card">
         <div class="stat-info">
@@ -522,11 +545,26 @@
   </div>
 
   <script>
-    const ADMIN_PASS = "JSEah&b55";
+    // جدول المستخدمين الاحتياطي
+    const USERS_DB = {
+      "admin": { pass: "JSEah&b55", role: "all", name: "المدير العام" },
+      "nusuk_lead": { pass: "Nusuk@2026", role: "مسار بطائق نُسك", name: "رئيس مسار بطائق نُسك" },
+      "safety_lead": { pass: "Safe@2026", role: "مسار الأمن والسلامة", name: "رئيس مسار الأمن والسلامة" },
+      "housing_lead": { pass: "House@2026", role: "مسار الإسكان والإيواء", name: "رئيس مسار الإسكان" },
+      "catering_lead": { pass: "Food@2026", role: "مسار الإعاشة", name: "رئيس مسار الإعاشة" },
+      "prep_lead": { pass: "Prep@2026", role: "مسار التجهيز والاستعداد المسبق", name: "رئيس مسار التجهيز" },
+      "tafweej_lead": { pass: "Tafweej@2026", role: "مسار التفويج", name: "رئيس مسار التفويج" },
+      "leaders_lead": { pass: "Leader@2026", role: "مسار القادة", name: "رئيس مسار القادة" },
+      "transport_lead": { pass: "Trans@2026", role: "مسار النقل", name: "رئيس مسار النقل" },
+      "mashaaer_lead": { pass: "Mashaer@2026", role: "مسار خدمات المشاعر", name: "رئيس مسار المشاعر" },
+      "care_lead": { pass: "Care@2026", role: "مسار خدمة العملاء", name: "رئيس مسار خدمة العملاء" }
+    };
+
+    let currentUser = null;
     let rawApplications = [];
+    let accessibleApplications = [];
     let currentFiltered = [];
 
-    // قاموس الأشكال الهندسية والألوان لكل مسار
     const trackConfig = {
       "مسار بطائق نُسك": { shapeClass: "shape-circle", color: "#0c594f", bg: "#e6f4ea", border: "#a7f3d0" },
       "مسار الأمن والسلامة": { shapeClass: "geo-shape", color: "#1e40af", bg: "#dbeafe", border: "#bfdbfe" },
@@ -558,30 +596,71 @@
       `;
     }
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
-      const enteredPass = document.getElementById("adminPassword").value.trim();
-      if (enteredPass === ADMIN_PASS) {
-        sessionStorage.setItem("admin_auth", "true");
+      const u = document.getElementById("adminUsername").value.trim();
+      const p = document.getElementById("adminPassword").value.trim();
+      const errBox = document.getElementById("loginError");
+
+      try {
+        const res = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: u, password: p })
+        });
+
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+          currentUser = result.user;
+          sessionStorage.setItem("admin_auth_user", JSON.stringify(currentUser));
+          errBox.style.display = "none";
+          showAdminPanel();
+          return;
+        }
+      } catch (error) {
+        console.warn("API Login unavailable, checking local fallback...");
+      }
+
+      // الرجوع للمطابقة المحلية الاحتياطية
+      if (USERS_DB[u] && USERS_DB[u].pass === p) {
+        currentUser = { username: u, ...USERS_DB[u] };
+        sessionStorage.setItem("admin_auth_user", JSON.stringify(currentUser));
+        errBox.style.display = "none";
         showAdminPanel();
       } else {
-        document.getElementById("loginError").style.display = "block";
+        errBox.style.display = "block";
       }
     }
 
     function showAdminPanel() {
       document.getElementById("loginOverlay").style.display = "none";
       document.getElementById("adminPanel").style.display = "block";
+
+      const jobFilter = document.getElementById("jobFilter");
+      const userBadge = document.getElementById("currentUserBadge");
+
+      userBadge.innerText = `👤 المستخدم: ${currentUser.name}`;
+
+      if (currentUser.role !== "all") {
+        jobFilter.value = currentUser.role;
+        jobFilter.disabled = true;
+      } else {
+        jobFilter.disabled = false;
+      }
+
       loadData();
     }
 
     function logout() {
-      sessionStorage.removeItem("admin_auth");
+      sessionStorage.removeItem("admin_auth_user");
       window.location.reload();
     }
 
     window.onload = function() {
-      if (sessionStorage.getItem("admin_auth") === "true") {
+      const saved = sessionStorage.getItem("admin_auth_user");
+      if (saved) {
+        currentUser = JSON.parse(saved);
         showAdminPanel();
       }
     };
@@ -596,8 +675,14 @@
         
         rawApplications = data.map(app => ({
           ...app,
-          status: normalizeStatus(localStatuses[app.id] || app.status)
+          status: normalizeStatus(app.status || localStatuses[app.id])
         }));
+
+        if (currentUser.role === "all") {
+          accessibleApplications = [...rawApplications];
+        } else {
+          accessibleApplications = rawApplications.filter(a => a.job === currentUser.role);
+        }
 
         updateStats();
         filterData();
@@ -607,11 +692,11 @@
     }
 
     function updateStats() {
-      const total = rawApplications.length;
-      const newC = rawApplications.filter(a => normalizeStatus(a.status) === "جديد").length;
-      const revC = rawApplications.filter(a => normalizeStatus(a.status) === "قيد المراجعة").length;
-      const accC = rawApplications.filter(a => normalizeStatus(a.status) === "مقبول").length;
-      const rejC = rawApplications.filter(a => normalizeStatus(a.status) === "مرفوض").length;
+      const total = accessibleApplications.length;
+      const newC = accessibleApplications.filter(a => normalizeStatus(a.status) === "جديد").length;
+      const revC = accessibleApplications.filter(a => normalizeStatus(a.status) === "قيد المراجعة").length;
+      const accC = accessibleApplications.filter(a => normalizeStatus(a.status) === "مقبول").length;
+      const rejC = accessibleApplications.filter(a => normalizeStatus(a.status) === "مرفوض").length;
 
       document.getElementById("totalCount").innerText = total;
       document.getElementById("newCount").innerText = newC;
@@ -620,19 +705,29 @@
       document.getElementById("rejectedCount").innerText = rejC;
     }
 
-    function updateStatus(id, newStatus, selectElem) {
+    async function updateStatus(id, newStatus, selectElem) {
       const normalized = normalizeStatus(newStatus);
       const item = rawApplications.find(a => String(a.id) === String(id));
       if (item) {
         item.status = normalized;
+
         const localStatuses = JSON.parse(localStorage.getItem("app_statuses") || "{}");
         localStatuses[id] = normalized;
         localStorage.setItem("app_statuses", JSON.stringify(localStatuses));
+
+        try {
+          await fetch(`/api/admin/applications/${id}/status`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: normalized })
+          });
+        } catch (e) {
+          console.log("تم الحفظ في المتصفح");
+        }
         
         selectElem.className = `status-select status-${getStatusClass(normalized)}`;
         updateStats();
 
-        // إعادة تطبيق الفلترة في حال كانت قائمة الفلترة مفعلة
         const currentFilter = document.getElementById("statusFilter").value.trim();
         if (currentFilter) {
           filterData();
@@ -653,7 +748,7 @@
       const job = document.getElementById("jobFilter").value.trim();
       const selectedStatus = document.getElementById("statusFilter").value.trim();
 
-      currentFiltered = rawApplications.filter(item => {
+      currentFiltered = accessibleApplications.filter(item => {
         const itemStatus = normalizeStatus(item.status);
 
         const matchQ = !q || (item.full_name && item.full_name.toLowerCase().includes(q)) ||
@@ -674,7 +769,7 @@
       tbody.innerHTML = "";
 
       if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding: 35px; color:#9ca3af; font-size:14px;">لا توجد أي طلبات مطابقة لمعايير البحث الحالية.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding: 35px; color:#9ca3af; font-size:14px;">لا توجد أي طلبات مطابقة للمعايير المحددة.</td></tr>`;
         return;
       }
 
@@ -726,15 +821,14 @@
         if (!res.ok) throw new Error("فشل الحذف");
 
         rawApplications = rawApplications.filter(a => String(a.id) !== String(id));
-        updateStats();
-        filterData();
+        loadData();
       } catch (e) {
         alert("حدث خطأ أثناء محاولة حذف الطلب.");
       }
     }
 
     function exportToExcel() {
-      const dataToExport = currentFiltered.length ? currentFiltered : rawApplications;
+      const dataToExport = currentFiltered.length ? currentFiltered : accessibleApplications;
       if (!dataToExport.length) return alert("لا توجد بيانات مطابقة لتصديرها!");
 
       let excelContent = `
