@@ -178,8 +178,13 @@
       position: relative;
     }
 
+    /* إخفاء آمن لحقل الملف لا يكسر الـ Validation */
     .file-group input[type="file"] {
-      display: none;
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
     }
 
     .file-label {
@@ -287,13 +292,13 @@
     <main class="form-wrapper">
       <div id="messageBox" class="alert-box" style="display: none;"></div>
 
-      <form id="jobApplicationForm" enctype="multipart/form-data">
-        <!-- المسار الوظيفي -->
+      <form id="jobApplicationForm" novalidate>
+        <!-- 1. المسار الوظيفي -->
         <div class="form-section">
           <h2>1. المسار الوظيفي</h2>
           <div class="input-group">
             <label for="job">المسار المطلوب <span class="req">*</span></label>
-            <select id="job" name="job" required>
+            <select id="job" name="job">
               <option value="" disabled selected>اختر المسار المتقدم إليه...</option>
               <option value="مسار بطائق نُسك">مسار بطائق نُسك</option>
               <option value="مسار الأمن والسلامة">مسار الأمن والسلامة</option>
@@ -309,30 +314,30 @@
           </div>
         </div>
 
-        <!-- البيانات الشخصية -->
+        <!-- 2. البيانات الشخصية -->
         <div class="form-section">
           <h2>2. البيانات الشخصية</h2>
           <div class="grid-2">
             <div class="input-group">
               <label for="fullName">الاسم الرباعي <span class="req">*</span></label>
-              <input type="text" id="fullName" name="fullName" placeholder="الاسم كما هو مدون في الهوية" required />
+              <input type="text" id="fullName" name="fullName" placeholder="الاسم كما هو مدون في الهوية" />
             </div>
 
             <div class="input-group">
               <label for="idNumber">رقم الهوية الوطنية / الإقامة <span class="req">*</span></label>
-              <input type="text" id="idNumber" name="idNumber" maxlength="10" placeholder="10 أرقام" required />
+              <input type="text" id="idNumber" name="idNumber" maxlength="10" placeholder="10 أرقام" />
             </div>
           </div>
 
           <div class="grid-3">
             <div class="input-group">
               <label for="birthDate">تاريخ الميلاد <span class="req">*</span></label>
-              <input type="date" id="birthDate" name="birthDate" required />
+              <input type="date" id="birthDate" name="birthDate" />
             </div>
 
             <div class="input-group">
               <label for="gender">الجنس <span class="req">*</span></label>
-              <select id="gender" name="gender" required>
+              <select id="gender" name="gender">
                 <option value="" disabled selected>اختر الجنس...</option>
                 <option value="ذكر">ذكر</option>
                 <option value="أنثى">أنثى</option>
@@ -341,7 +346,7 @@
 
             <div class="input-group">
               <label for="nationality">الجنسية <span class="req">*</span></label>
-              <select id="nationality" name="nationality" required>
+              <select id="nationality" name="nationality">
                 <option value="" disabled selected>اختر الجنسية...</option>
                 <option value="سعودي">سعودي</option>
                 <option value="مصري">مصري</option>
@@ -359,23 +364,23 @@
           </div>
         </div>
 
-        <!-- بيانات التواصل ومكان الإقامة -->
+        <!-- 3. بيانات التواصل ومكان الإقامة -->
         <div class="form-section">
           <h2>3. التواصل ومكان الإقامة</h2>
           <div class="grid-3">
             <div class="input-group">
               <label for="phone">رقم الجوال <span class="req">*</span></label>
-              <input type="tel" id="phone" name="phone" placeholder="05xxxxxxxx" maxlength="10" required />
+              <input type="tel" id="phone" name="phone" placeholder="05xxxxxxxx" maxlength="10" />
             </div>
 
             <div class="input-group">
               <label for="email">البريد الإلكتروني <span class="req">*</span></label>
-              <input type="email" id="email" name="email" placeholder="example@email.com" required />
+              <input type="email" id="email" name="email" placeholder="example@email.com" />
             </div>
 
             <div class="input-group">
               <label for="city">مدينة الإقامة <span class="req">*</span></label>
-              <select id="city" name="city" required>
+              <select id="city" name="city">
                 <option value="" disabled selected>-- اختر --</option>
                 <option value="الرياض">الرياض</option>
                 <option value="جدة">جدة</option>
@@ -392,13 +397,13 @@
           </div>
         </div>
 
-        <!-- المؤهلات والخبرات -->
+        <!-- 4. المؤهلات والخبرات -->
         <div class="form-section">
           <h2>4. المؤهلات والخبرات</h2>
           <div class="grid-2">
             <div class="input-group">
               <label for="education">المؤهل التعليمي <span class="req">*</span></label>
-              <select id="education" name="education" required>
+              <select id="education" name="education">
                 <option value="" disabled selected>اختر المؤهل التعليمي...</option>
                 <option value="ابتدائي">ابتدائي</option>
                 <option value="متوسط">متوسط</option>
@@ -430,7 +435,7 @@
 
           <div class="input-group">
             <label for="trainingCourse">اجتياز المسار التدريبي المعتمد لمراكز الضيافة <span class="req">*</span></label>
-            <select id="trainingCourse" name="trainingCourse" required>
+            <select id="trainingCourse" name="trainingCourse">
               <option value="" disabled selected>اختر المسار التدريبي المجتاز...</option>
               <option value="مسار الأمن والسلامة">مسار الأمن والسلامة</option>
               <option value="مسار الإسكان والإيواء">مسار الإسكان والإيواء</option>
@@ -447,7 +452,7 @@
           </div>
         </div>
 
-        <!-- المرفقات والمستندات -->
+        <!-- 5. المستندات والمرفقات الرسمية -->
         <div class="form-section">
           <h2>5. المستندات والمرفقات الرسمية</h2>
           <p class="section-desc">الصيغ المسموحة: PDF، JPG، PNG (الحد الأقصى 10 ميجابايت لكل ملف)</p>
@@ -455,14 +460,14 @@
           <div class="grid-2">
             <div class="input-group file-group">
               <label>صورة الهوية الوطنية / الإقامة <span class="req">*</span></label>
-              <input type="file" id="idFile" name="idFile" accept=".pdf,image/jpeg,image/png" required />
-              <label for="idFile" class="file-label">اختر ملف الهوية...</label>
+              <input type="file" id="idFile" name="idFile" accept=".pdf,image/jpeg,image/png" />
+              <label for="idFile" class="file-label" id="label-idFile">اختر ملف الهوية...</label>
             </div>
 
             <div class="input-group file-group">
               <label>السيرة الذاتية (CV)</label>
               <input type="file" id="cvFile" name="cvFile" accept=".pdf,image/jpeg,image/png" />
-              <label for="cvFile" class="file-label">اختر ملف السيرة الذاتية...</label>
+              <label for="cvFile" class="file-label" id="label-cvFile">اختر ملف السيرة الذاتية...</label>
             </div>
           </div>
 
@@ -470,13 +475,13 @@
             <div class="input-group file-group">
               <label>وثيقة التخرج / المؤهل التعليمي</label>
               <input type="file" id="qualificationFile" name="qualificationFile" accept=".pdf,image/jpeg,image/png" />
-              <label for="qualificationFile" class="file-label">اختر وثيقة المؤهل...</label>
+              <label for="qualificationFile" class="file-label" id="label-qualificationFile">اختر وثيقة المؤهل...</label>
             </div>
 
             <div class="input-group file-group">
               <label>شهادة برنامج قادة مراكز الضيافة (إن وُجد)</label>
               <input type="file" id="experienceFile" name="experienceFile" accept=".pdf,image/jpeg,image/png" />
-              <label for="experienceFile" class="file-label">اختر ملف الشهادة...</label>
+              <label for="experienceFile" class="file-label" id="label-experienceFile">اختر ملف الشهادة...</label>
             </div>
           </div>
         </div>
@@ -496,6 +501,132 @@
     </footer>
   </div>
 
-  <script src="./script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const form = document.getElementById("jobApplicationForm");
+      const submitBtn = document.getElementById("submitBtn");
+      const btnText = document.getElementById("btnText");
+      const btnSpinner = document.getElementById("btnSpinner");
+      const messageBox = document.getElementById("messageBox");
+
+      // تفاعل اختيار الملفات
+      const fileInputs = [
+        { id: "idFile", defaultText: "اختر ملف الهوية..." },
+        { id: "cvFile", defaultText: "اختر ملف السيرة الذاتية..." },
+        { id: "qualificationFile", defaultText: "اختر وثيقة المؤهل..." },
+        { id: "experienceFile", defaultText: "اختر ملف الشهادة..." }
+      ];
+
+      fileInputs.forEach(item => {
+        const inputEl = document.getElementById(item.id);
+        const labelEl = document.getElementById("label-" + item.id);
+        if (inputEl && labelEl) {
+          inputEl.addEventListener("change", function(e) {
+            if (e.target.files && e.target.files[0]) {
+              labelEl.textContent = "تم اختيار: " + e.target.files[0].name;
+              labelEl.style.borderColor = "#0c594f";
+              labelEl.style.color = "#0c594f";
+              labelEl.style.backgroundColor = "#f0fdfa";
+            } else {
+              labelEl.textContent = item.defaultText;
+              labelEl.style.borderColor = "";
+              labelEl.style.color = "";
+              labelEl.style.backgroundColor = "";
+            }
+          });
+        }
+      });
+
+      function showMessage(text, isError) {
+        if (!messageBox) return;
+        messageBox.textContent = text;
+        messageBox.className = "alert-box " + (isError ? "alert-error" : "alert-success");
+        messageBox.style.display = "block";
+        messageBox.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      function hideMessage() {
+        if (!messageBox) return;
+        messageBox.style.display = "none";
+        messageBox.textContent = "";
+      }
+
+      function setSubmitting(isSubmitting) {
+        if (!submitBtn) return;
+        submitBtn.disabled = isSubmitting;
+        if (btnSpinner) btnSpinner.style.display = isSubmitting ? "inline-block" : "none";
+        if (btnText) btnText.textContent = isSubmitting ? "جاري الإرسال وحفظ الطلب..." : "إرسال الطلب";
+      }
+
+      form.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        hideMessage();
+
+        const job = document.getElementById("job").value.trim();
+        const fullName = document.getElementById("fullName").value.trim();
+        const idNumber = document.getElementById("idNumber").value.trim();
+        const birthDate = document.getElementById("birthDate").value.trim();
+        const gender = document.getElementById("gender").value.trim();
+        const nationality = document.getElementById("nationality").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const city = document.getElementById("city").value.trim();
+        const education = document.getElementById("education").value.trim();
+        const trainingCourse = document.getElementById("trainingCourse").value.trim();
+        const idFile = document.getElementById("idFile").files[0];
+
+        // التحقق من الحقول
+        if (!job) return showMessage("يرجى تحديد المسار المطلوب.", true);
+        if (!fullName) return showMessage("يرجى إدخال الاسم الرباعي.", true);
+        if (!idNumber || !/^\d{10}$/.test(idNumber)) return showMessage("رقم الهوية / الإقامة يجب أن يتكون من 10 أرقام.", true);
+        if (!birthDate) return showMessage("يرجى إدخال تاريخ الميلاد.", true);
+        if (!gender) return showMessage("يرجى تحديد الجنس.", true);
+        if (!nationality) return showMessage("يرجى تحديد الجنسية.", true);
+        if (!phone || !/^05\d{8}$/.test(phone)) return showMessage("رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام.", true);
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showMessage("البريد الإلكتروني المدخل غير صحيح.", true);
+        if (!city) return showMessage("يرجى تحديد مدينة الإقامة.", true);
+        if (!education) return showMessage("يرجى تحديد المؤهل التعليمي.", true);
+        if (!trainingCourse) return showMessage("يرجى تحديد المسار التدريبي المجتاز.", true);
+        if (!idFile) return showMessage("يرجى إرفاق صورة أو ملف الهوية / الإقامة.", true);
+
+        setSubmitting(true);
+
+        try {
+          const formData = new FormData(form);
+
+          const response = await fetch("/api/applications", {
+            method: "POST",
+            body: formData
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.message || "تعذر حفظ الطلب في السيرفر.");
+          }
+
+          showMessage("تم استلام طلبك وتوثيقه بنجاح! شكراً لتقديمك.", false);
+          form.reset();
+
+          // إعادة ضبط أزرار الملفات
+          fileInputs.forEach(item => {
+            const labelEl = document.getElementById("label-" + item.id);
+            if (labelEl) {
+              labelEl.textContent = item.defaultText;
+              labelEl.style.borderColor = "";
+              labelEl.style.color = "";
+              labelEl.style.backgroundColor = "";
+            }
+          });
+
+        } catch (err) {
+          console.error("Submission Error:", err);
+          showMessage(err.message || "حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.", true);
+        } finally {
+          setSubmitting(false);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
