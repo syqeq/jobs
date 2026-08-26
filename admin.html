@@ -780,11 +780,13 @@
       }
 
       items.forEach((item, index) => {
-        const getLink = (f, title) => {
-          if (!f) return `<span style="color:#cbd5e1">-</span>`;
-          const href = f.startsWith("http") ? f : `/api/uploads/${f}`;
-          return `<a class="file-badge" href="${href}" target="_blank">📄 ${title}</a>`;
-        };
+       const getLink = (f, title) => {
+  if (!f) return `<span style="color:#cbd5e1">-</span>`;
+  const href = f.startsWith("http") 
+    ? f 
+    : `/api/uploads/${encodeURIComponent(f)}?token=${encodeURIComponent(authToken)}`;
+  return `<a class="file-badge" href="${href}" target="_blank">📄 ${title}</a>`;
+};
 
         const currentStatus = normalizeStatus(item.status);
         const statusClass = `status-${getStatusClass(currentStatus)}`;
