@@ -11,6 +11,9 @@ const { createClient } = require("@supabase/supabase-js");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// تفعيل قراءة الـ IP الحقيقي خلف بروكسي Vercel لحل خطأ X-Forwarded-For
+app.set("trust proxy", 1);
+
 const JWT_SECRET = process.env.JWT_SECRET || "seera-secure-token-secret-key-2026";
 
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://rwdrwcqkpljiopruhjty.supabase.co";
@@ -43,16 +46,20 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(express.static(path.join(__dirname)));
 
-
+// ضبط الـ Rate Limit ليتوافق تماماً مع Vercel
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, 
-  max: 6, 
-  message: { success: false, message: "تم تجاوز عدد المحاولات المسموحة. يرجى الانتظار 15 دقيقة." }
+  max: 30, 
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "تم تجاوز عدد محاولات الدخول المسموحة. يرجى الانتظار قليلاً." }
 });
 
 const submitLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 10, 
+  max: 20, 
+  standardHeaders: true,
+  legacyHeaders: false,
   message: { success: false, message: "تم تجاوز الحد الأقصى لإرسال الطلبات من هذا الجهاز." }
 });
 
