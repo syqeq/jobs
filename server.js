@@ -4,15 +4,15 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// مفتاح توقيع التوكن السري
 const JWT_SECRET = process.env.JWT_SECRET || "seera-secure-token-secret-key-2026";
 
-// الاتصال بـ Supabase
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://rwdrwcqkpljiopruhjty.supabase.co";
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
@@ -34,11 +34,28 @@ if (!fs.existsSync(UPLOAD_DIR)) {
   }
 }
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(express.static(path.join(__dirname)));
 
-// دالة وسيطة للتحقق من هوية المشرف وصلاحياته (JWT Middleware)
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 6, 
+  message: { success: false, message: "تم تجاوز عدد المحاولات المسموحة. يرجى الانتظار 15 دقيقة." }
+});
+
+const submitLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10, 
+  message: { success: false, message: "تم تجاوز الحد الأقصى لإرسال الطلبات من هذا الجهاز." }
+});
+
 function authenticateAdmin(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -48,20 +65,29 @@ function authenticateAdmin(req, res, next) {
   const token = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.admin = decoded; // يحتوي على username, name, role
+    req.admin = decoded;
     next();
   } catch (err) {
     return res.status(403).json({ success: false, message: "جلسة الدخول منتهية أو غير صالحة" });
   }
 }
 
-// استخدام الذاكرة لرفع الملفات مباشرة إلى Supabase Storage
+function isValidFileSignature(buffer) {
+  if (!buffer || buffer.length < 4) return false;
+  
+  const isPdf = buffer[0] === 0x25 && buffer[1] === 0x50 && buffer[2] === 0x44 && buffer[3] === 0x46;
+  const isJpg = buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF;
+  const isPng = buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47;
+
+  return isPdf || isJpg || isPng;
+}
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024, files: 4 },
   fileFilter: (req, file, cb) => {
-    const allowed = ["application/pdf", "image/jpeg", "image/png"];
-    if (!allowed.includes(file.mimetype)) {
+    const allowedMimes = ["application/pdf", "image/jpeg", "image/png"];
+    if (!allowedMimes.includes(file.mimetype)) {
       return cb(new Error("نوع الملف غير مسموح. يرجى استخدام PDF أو JPG أو PNG."));
     }
     cb(null, true);
@@ -94,9 +120,13 @@ function validate(body, files) {
   return null;
 }
 
-// دالة مساعدة لرفع الملف إلى Supabase Storage
 async function uploadToSupabase(file) {
   if (!file) return null;
+  
+  if (!isValidFileSignature(file.buffer)) {
+    throw new Error("محتوى الملف غير صالح أو تم التلاعب به.");
+  }
+
   const ext = path.extname(file.originalname).toLowerCase();
   const filename = `${Date.now()}-${crypto.randomUUID()}${ext}`;
 
@@ -104,7 +134,7 @@ async function uploadToSupabase(file) {
     .from("uploads")
     .upload(filename, file.buffer, {
       contentType: file.mimetype,
-      upsert: true
+      upsert: false
     });
 
   if (error) {
@@ -114,8 +144,7 @@ async function uploadToSupabase(file) {
   return filename;
 }
 
-// استقبال وحفظ طلب التوظيف
-app.post("/api/applications", (req, res) => {
+app.post("/api/applications", submitLimiter, (req, res) => {
   upload(req, res, async (err) => {
     if (err) return res.status(400).json({ message: err.message });
 
@@ -156,7 +185,6 @@ app.post("/api/applications", (req, res) => {
 
       if (dbError) throw dbError;
 
-      // إشعار البريد
       fetch("https://formsubmit.co/ajax/Ahmed.Zahrani@Almosafer.com", {
         method: "POST",
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -175,13 +203,12 @@ app.post("/api/applications", (req, res) => {
       });
     } catch (e) {
       console.error(e);
-      res.status(500).json({ message: "حدث خطأ في حفظ الطلب." });
+      res.status(500).json({ message: e.message || "حدث خطأ في حفظ الطلب." });
     }
   });
 });
 
-// مسار تسجيل دخول المشرفين وإصدار الـ Token المشفر
-app.post("/api/admin/login", async (req, res) => {
+app.post("/api/admin/login", loginLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -200,7 +227,6 @@ app.post("/api/admin/login", async (req, res) => {
       return res.status(401).json({ success: false, message: "بيانات الدخول غير صحيحة" });
     }
 
-    // إنشاء توكن مشفر يحتوي على الصلاحيات لمدة 12 ساعة
     const token = jwt.sign(
       { username: user.username, name: user.full_name, role: user.allowed_track },
       JWT_SECRET,
@@ -222,7 +248,6 @@ app.post("/api/admin/login", async (req, res) => {
   }
 });
 
-// مسار جلب الطلبات (محمي ومفحوص بالتوكن)
 app.get("/api/admin/applications", authenticateAdmin, async (req, res) => {
   try {
     const userRole = req.admin.role;
@@ -232,7 +257,6 @@ app.get("/api/admin/applications", authenticateAdmin, async (req, res) => {
       .select("*")
       .order("created_at", { ascending: false });
 
-    // السيرفر يفرض الفلترة حسب صلاحية التوكن حصراً
     if (userRole && userRole !== "all") {
       query = query.eq("job", userRole);
     }
@@ -247,7 +271,6 @@ app.get("/api/admin/applications", authenticateAdmin, async (req, res) => {
   }
 });
 
-// مسار تحديث حالة الطلب (محمي بالتوكن)
 app.patch("/api/admin/applications/:id/status", authenticateAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -272,7 +295,6 @@ app.patch("/api/admin/applications/:id/status", authenticateAdmin, async (req, r
   }
 });
 
-// مسار حذف الطلب (محمي بالتوكن)
 app.delete("/api/admin/applications/:id", authenticateAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -291,19 +313,16 @@ app.delete("/api/admin/applications/:id", authenticateAdmin, async (req, res) =>
   }
 });
 
-// مسار استعراض وتحميل الملفات
-app.get("/api/uploads/:filename", async (req, res) => {
+app.get("/api/uploads/:filename", authenticateAdmin, async (req, res) => {
   try {
     const { filename } = req.params;
-    const { data } = supabase.storage.from('uploads').getPublicUrl(filename);
     
-    if (data && data.publicUrl) {
-      return res.redirect(data.publicUrl);
-    }
-
-    const localFile = path.join(UPLOAD_DIR, filename);
-    if (fs.existsSync(localFile)) {
-      return res.sendFile(localFile);
+    const { data, error } = await supabase.storage
+      .from('uploads')
+      .createSignedUrl(filename, 60);
+    
+    if (data && data.signedUrl) {
+      return res.redirect(data.signedUrl);
     }
 
     res.status(404).send("الملف غير موجود.");
