@@ -427,6 +427,24 @@
               <input type="text" id="languages" name="languages" placeholder="مثال: العربية، الإنجليزية، الأردية" />
             </div>
           </div>
+
+          <div class="input-group">
+            <label for="trainingCourse">اجتياز المسار التدريبي المعتمد لمراكز الضيافة <span class="req">*</span></label>
+            <select id="trainingCourse" name="trainingCourse" required>
+              <option value="" disabled selected>اختر المسار التدريبي المجتاز...</option>
+              <option value="مسار الأمن والسلامة">مسار الأمن والسلامة</option>
+              <option value="مسار الإسكان والإيواء">مسار الإسكان والإيواء</option>
+              <option value="مسار الإعاشة">مسار الإعاشة</option>
+              <option value="مسار التجهيز والاستعداد المسبق">مسار التجهيز والاستعداد المسبق</option>
+              <option value="مسار التفويج">مسار التفويج</option>
+              <option value="مسار القادة">مسار القادة</option>
+              <option value="مسار النقل">مسار النقل</option>
+              <option value="مسار خدمات المشاعر">مسار خدمات المشاعر</option>
+              <option value="مسار خدمة العملاء">مسار خدمة العملاء</option>
+              <option value="مسار بطائق نُسك">مسار بطائق نُسك</option>
+              <option value="لا يوجد">لا يوجد</option>
+            </select>
+          </div>
         </div>
 
         <!-- المرفقات والمستندات -->
@@ -456,9 +474,9 @@
             </div>
 
             <div class="input-group file-group">
-              <label>رخصة المسار</label>
+              <label>شهادة برنامج قادة مراكز الضيافة (إن وُجد)</label>
               <input type="file" id="experienceFile" name="experienceFile" accept=".pdf,image/jpeg,image/png" />
-              <label for="experienceFile" class="file-label">اختر ملف رخصة المسار...</label>
+              <label for="experienceFile" class="file-label">اختر ملف الشهادة...</label>
             </div>
           </div>
         </div>
