@@ -8,10 +8,14 @@ const { createClient } = require("@supabase/supabase-js");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// الاتصال بـ Supabase
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://rwdrwcqkpljiopruhjty.supabase.co";
-const SUPABASE_KEY = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3ZHJ3Y3FrcGxqaW9wcnVoanR5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NzUxMzAwMywiZXhwIjoyMTAzMDg5MDAzfQ.YUFQIf-pNMi80Lnd4Py3ZTmbl3XsxANdU4kXVdmfIdo";
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+if (!SUPABASE_KEY) {
+  console.warn("تنبيه أمني: لم يتم العثور على SUPABASE_KEY في متغيرات البيئة.");
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY || "");
 
 const UPLOAD_DIR = process.env.VERCEL 
   ? path.join('/tmp', 'uploads') 
@@ -29,7 +33,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// استخدام الذاكرة لرفع الملفات مباشرة إلى Supabase Storage
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024, files: 4 },
@@ -68,7 +71,6 @@ function validate(body, files) {
   return null;
 }
 
-// دالة مساعدة لرفع الملف إلى Supabase Storage
 async function uploadToSupabase(file) {
   if (!file) return null;
   const ext = path.extname(file.originalname).toLowerCase();
@@ -88,7 +90,6 @@ async function uploadToSupabase(file) {
   return filename;
 }
 
-// استقبال وحفظ طلب التوظيف
 app.post("/api/applications", (req, res) => {
   upload(req, res, async (err) => {
     if (err) return res.status(400).json({ message: err.message });
@@ -97,7 +98,6 @@ app.post("/api/applications", (req, res) => {
       const error = validate(req.body, req.files);
       if (error) return res.status(400).json({ message: error });
 
-      // رفع الملفات إلى Supabase Storage
       const idFile = req.files?.idFile?.[0] ? await uploadToSupabase(req.files.idFile[0]) : null;
       const cvFile = req.files?.cvFile?.[0] ? await uploadToSupabase(req.files.cvFile[0]) : null;
       const qualificationFile = req.files?.qualificationFile?.[0] ? await uploadToSupabase(req.files.qualificationFile[0]) : null;
@@ -131,7 +131,6 @@ app.post("/api/applications", (req, res) => {
 
       if (dbError) throw dbError;
 
-      // إشعار البريد
       fetch("https://formsubmit.co/ajax/Ahmed.Zahrani@Almosafer.com", {
         method: "POST",
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -155,7 +154,6 @@ app.post("/api/applications", (req, res) => {
   });
 });
 
-// مسار تسجيل دخول المشرفين والتحقق من الصلاحيات
 app.post("/api/admin/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -189,13 +187,20 @@ app.post("/api/admin/login", async (req, res) => {
   }
 });
 
-// مسار جلب جميع الطلبات للوحة التحكم
 app.get("/api/admin/applications", async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const requestedTrack = req.headers["x-user-role"];
+
+    let query = supabase
       .from("applications")
       .select("*")
       .order("created_at", { ascending: false });
+
+    if (requestedTrack && requestedTrack !== "all") {
+      query = query.eq("job", requestedTrack);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     res.json(data);
@@ -205,7 +210,6 @@ app.get("/api/admin/applications", async (req, res) => {
   }
 });
 
-// مسار تحديث حالة الطلب في قاعدة البيانات
 app.patch("/api/admin/applications/:id/status", async (req, res) => {
   try {
     const { id } = req.params;
@@ -230,7 +234,6 @@ app.patch("/api/admin/applications/:id/status", async (req, res) => {
   }
 });
 
-// مسار حذف طلب من قاعدة البيانات
 app.delete("/api/admin/applications/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -249,12 +252,10 @@ app.delete("/api/admin/applications/:id", async (req, res) => {
   }
 });
 
-// مسار استعراض وتحميل الملفات المرفوعة عبر Supabase Storage
 app.get("/api/uploads/:filename", async (req, res) => {
   try {
     const { filename } = req.params;
     
-    // جلب الرابط المباشر من سلة التخزين uploads
     const { data } = supabase.storage.from('uploads').getPublicUrl(filename);
     
     if (data && data.publicUrl) {
