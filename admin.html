@@ -772,55 +772,56 @@
     }
 
     function renderRows(items) {
-      const tbody = document.getElementById("tableBody");
-      tbody.innerHTML = "";
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
 
-      if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding: 35px; color:#9ca3af; font-size:14px;">لا توجد أي طلبات مطابقة للمعايير المحددة.</td></tr>`;
-        return;
-      }
+  if (!items || items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="15" style="text-align:center; padding: 35px; color:#9ca3af; font-size:14px;">لا توجد أي طلبات مطابقة للمعايير المحددة.</td></tr>`;
+    return;
+  }
 
-      items.forEach((item, index) => {
-       const getLink = (f, title) => {
-  if (!f) return `<span style="color:#cbd5e1">-</span>`;
-  const href = f.startsWith("http") 
-    ? f 
-    : `/api/uploads/${encodeURIComponent(f)}?token=${encodeURIComponent(authToken)}`;
-  return `<a class="file-badge" href="${href}" target="_blank">📄 ${title}</a>`;
-};
+  items.forEach((item, index) => {
+    const getLink = (f, title) => {
+      if (!f) return `<span style="color:#cbd5e1">-</span>`;
+      const href = f.startsWith("http") 
+        ? f 
+        : `/api/uploads/${encodeURIComponent(f)}?token=${encodeURIComponent(authToken)}`;
+      return `<a class="file-badge" href="${href}" target="_blank">📄 ${title}</a>`;
+    };
 
-        const currentStatus = normalizeStatus(item.status);
-        const statusClass = `status-${getStatusClass(currentStatus)}`;
+    const currentStatus = normalizeStatus(item.status);
+    const statusClass = `status-${getStatusClass(currentStatus)}`;
 
-        tbody.innerHTML += `
-          <tr id="row-${item.id}">
-            <td>${index + 1}</td>
-            <td><strong>${escapeHtml(item.full_name) || "-"}</strong></td>
-            <td>${renderTrackBadge(item.job)}</td>
-            <td>
-              <select class="status-select ${statusClass}" onchange="updateStatus('${item.id}', this.value, this)">
-                <option value="جديد" ${currentStatus === 'جديد' ? 'selected' : ''}>جديد</option>
-                <option value="قيد المراجعة" ${currentStatus === 'قيد المراجعة' ? 'selected' : ''}>قيد المراجعة</option>
-                <option value="مقبول" ${currentStatus === 'مقبول' ? 'selected' : ''}>مقبول</option>
-                <option value="مرفوض" ${currentStatus === 'مرفوض' ? 'selected' : ''}>مرفوض</option>
-              </select>
-            </td>
-            <td><code>${escapeHtml(item.id_number) || "-"}</code></td>
-            <td>${escapeHtml(item.phone) || "-"}</td>
-            <td>${escapeHtml(item.city) || "-"}</td>
-            <td>${escapeHtml(item.education) || "-"}</td>
-            <td>${escapeHtml(item.major) || "بدون"}</td>
-            <td>${getLink(item.id_file, "الهوية")}</td>
-            <td>${getLink(item.cv_file, "السيرة")}</td>
-            <td>${getLink(item.qualification_file, "المؤهل")}</td>
-            <td>${getLink(item.experience_file, "الرخصة")}</td>
-            <td>
-              <button class="btn-delete" onclick="deleteApp('${item.id}')">حذف</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
+    tbody.innerHTML += `
+      <tr id="row-${item.id}">
+        <td>${index + 1}</td>
+        <td><strong>${escapeHtml(item.full_name) || "-"}</strong></td>
+        <td>${renderTrackBadge(item.job)}</td>
+        <td>${escapeHtml(item.training_course) || "لا يوجد"}</td>
+        <td>
+          <select class="status-select ${statusClass}" onchange="updateStatus('${item.id}', this.value, this)">
+            <option value="جديد" ${currentStatus === 'جديد' ? 'selected' : ''}>جديد</option>
+            <option value="قيد المراجعة" ${currentStatus === 'قيد المراجعة' ? 'selected' : ''}>قيد المراجعة</option>
+            <option value="مقبول" ${currentStatus === 'مقبول' ? 'selected' : ''}>مقبول</option>
+            <option value="مرفوض" ${currentStatus === 'مرفوض' ? 'selected' : ''}>مرفوض</option>
+          </select>
+        </td>
+        <td><code>${escapeHtml(item.id_number) || "-"}</code></td>
+        <td>${escapeHtml(item.phone) || "-"}</td>
+        <td>${escapeHtml(item.city) || "-"}</td>
+        <td>${escapeHtml(item.education) || "-"}</td>
+        <td>${escapeHtml(item.major) || "بدون"}</td>
+        <td>${getLink(item.id_file, "الهوية")}</td>
+        <td>${getLink(item.cv_file, "السيرة")}</td>
+        <td>${getLink(item.qualification_file, "المؤهل")}</td>
+        <td>${getLink(item.experience_file, "الشهادة")}</td>
+        <td>
+          <button class="btn-delete" onclick="deleteApp('${item.id}')">حذف</button>
+        </td>
+      </tr>
+    `;
+  });
+}
 
     async function deleteApp(id) {
       if (!confirm("هل أنت متأكد من رغبتك في حذف هذا الطلب نهائياً؟")) return;
