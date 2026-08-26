@@ -113,7 +113,7 @@ function clean(value) {
 function validate(body, files) {
   const required = [
     "job", "idNumber", "fullName", "birthDate", "gender", "nationality",
-    "phone", "email", "city", "education"
+    "phone", "email", "city", "education", "trainingCourse"
   ];
 
   for (const field of required) {
@@ -179,6 +179,7 @@ app.post("/api/applications", submitLimiter, (req, res) => {
         major: clean(req.body.major) || "بدون تخصص",
         experience: Number(req.body.experience) || 0,
         languages: clean(req.body.languages) || "غير محدد",
+        training_course: clean(req.body.trainingCourse) || "لا يوجد",
         id_file: idFile,
         cv_file: cvFile,
         qualification_file: qualificationFile,
@@ -201,6 +202,7 @@ app.post("/api/applications", submitLimiter, (req, res) => {
           الاسم: record.full_name,
           الهوية: record.id_number,
           المسار: record.job,
+          المسار_التدريبي: record.training_course,
           الجوال: record.phone
         })
       }).catch(mailErr => console.error("Email error:", mailErr));
@@ -360,7 +362,6 @@ app.get("/api/uploads/:filename", async (req, res) => {
   }
 });
 
-// 7. توجيه الصفحات الثابتة لضمان عمل الموقع
 // 7. توجيه الصفحات الثابتة لضمان عمل الموقع
 app.get('/logo.jpeg', (req, res) => {
   res.sendFile(path.join(__dirname, 'logo.jpeg'));
