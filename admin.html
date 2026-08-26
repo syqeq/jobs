@@ -36,7 +36,7 @@
       color: var(--text);
     }
 
-    /* تسجيل الدخول */
+  
     #loginOverlay {
       position: fixed;
       inset: 0;
@@ -122,7 +122,7 @@
       display: none;
     }
 
-    /* الحاوية الرئيسية */
+   
     .container {
       max-width: 1650px;
       margin: 0 auto;
@@ -204,7 +204,7 @@
     .btn-logout { background: #f8fafc; color: var(--text-muted); border: 1px solid var(--border); }
     .btn-logout:hover { background: #fee2e2; color: #dc2626; }
 
-    /* بطاقات الحالات */
+
     .stats-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -254,7 +254,7 @@
     .icon-accepted { background: #dcfce7; color: #16a34a; }
     .icon-rejected { background: #fee2e2; color: #dc2626; }
 
-    /* التحكم والفلترة */
+  
     .controls-bar {
       padding: 16px 30px;
       display: flex;
@@ -303,7 +303,7 @@
       color: #64748b;
     }
 
-    /* الجدول */
+  
     .table-container {
       padding: 10px 30px 30px;
       overflow-x: auto;
@@ -413,7 +413,7 @@
 </head>
 <body>
 
-  <!-- شاشة الدخول -->
+
   <div id="loginOverlay">
     <div class="login-card">
       <img src="https://rwdrwcqkpljiopruhjty.supabase.co/storage/v1/object/public/uploads/1787625052832-a49c3d2b-ee78-41b8-a709-e832fb9d310c.jpeg" alt="مجموعة سيرا" class="login-logo" />
@@ -428,7 +428,7 @@
     </div>
   </div>
 
-  <!-- لوحة التحكم -->
+
   <div class="container" id="adminPanel">
     <header class="header">
       <div class="header-brand">
@@ -446,7 +446,7 @@
       </div>
     </header>
 
-    <!-- بطاقات الحالات -->
+   
     <div class="stats-container">
       <div class="stat-card">
         <div class="stat-info">
@@ -485,7 +485,7 @@
       </div>
     </div>
 
-    <!-- شريط البحث والفلترة -->
+   
     <div class="controls-bar">
       <div class="search-box">
         <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم، رقم الهوية، أو الجوال..." oninput="filterData()" />
@@ -516,7 +516,7 @@
       </div>
     </div>
 
-    <!-- الجدول -->
+   
     <div class="table-container">
       <table>
         <thead>
@@ -545,21 +545,6 @@
   </div>
 
   <script>
-    // جدول المستخدمين الاحتياطي
-    const USERS_DB = {
-      "admin": { pass: "JSEah&b55", role: "all", name: "المدير العام" },
-      "nusuk_lead": { pass: "Nusuk@2026", role: "مسار بطائق نُسك", name: "رئيس مسار بطائق نُسك" },
-      "safety_lead": { pass: "Safe@2026", role: "مسار الأمن والسلامة", name: "رئيس مسار الأمن والسلامة" },
-      "housing_lead": { pass: "House@2026", role: "مسار الإسكان والإيواء", name: "رئيس مسار الإسكان" },
-      "catering_lead": { pass: "Food@2026", role: "مسار الإعاشة", name: "رئيس مسار الإعاشة" },
-      "prep_lead": { pass: "Prep@2026", role: "مسار التجهيز والاستعداد المسبق", name: "رئيس مسار التجهيز" },
-      "tafweej_lead": { pass: "Tafweej@2026", role: "مسار التفويج", name: "رئيس مسار التفويج" },
-      "leaders_lead": { pass: "Leader@2026", role: "مسار القادة", name: "رئيس مسار القادة" },
-      "transport_lead": { pass: "Trans@2026", role: "مسار النقل", name: "رئيس مسار النقل" },
-      "mashaaer_lead": { pass: "Mashaer@2026", role: "مسار خدمات المشاعر", name: "رئيس مسار المشاعر" },
-      "care_lead": { pass: "Care@2026", role: "مسار خدمة العملاء", name: "رئيس مسار خدمة العملاء" }
-    };
-
     let currentUser = null;
     let rawApplications = [];
     let accessibleApplications = [];
@@ -602,6 +587,12 @@
       const p = document.getElementById("adminPassword").value.trim();
       const errBox = document.getElementById("loginError");
 
+      if (!u || !p) {
+        errBox.innerText = "يرجى إدخال اسم المستخدم وكلمة المرور";
+        errBox.style.display = "block";
+        return;
+      }
+
       try {
         const res = await fetch("/api/admin/login", {
           method: "POST",
@@ -616,19 +607,12 @@
           sessionStorage.setItem("admin_auth_user", JSON.stringify(currentUser));
           errBox.style.display = "none";
           showAdminPanel();
-          return;
+        } else {
+          errBox.innerText = result.message || "بيانات الدخول غير صحيحة";
+          errBox.style.display = "block";
         }
       } catch (error) {
-        console.warn("API Login unavailable, checking local fallback...");
-      }
-
-      // الرجوع للمطابقة المحلية الاحتياطية
-      if (USERS_DB[u] && USERS_DB[u].pass === p) {
-        currentUser = { username: u, ...USERS_DB[u] };
-        sessionStorage.setItem("admin_auth_user", JSON.stringify(currentUser));
-        errBox.style.display = "none";
-        showAdminPanel();
-      } else {
+        errBox.innerText = "تعذر الاتصال بالخادم للتحقق من الحساب";
         errBox.style.display = "block";
       }
     }
@@ -667,15 +651,18 @@
 
     async function loadData() {
       try {
-        const res = await fetch("/api/admin/applications");
+        const res = await fetch("/api/admin/applications", {
+          headers: {
+            "x-user-role": currentUser ? currentUser.role : "all"
+          }
+        });
         if (!res.ok) throw new Error("تعذر جلب البيانات");
 
         const data = await res.json();
-        const localStatuses = JSON.parse(localStorage.getItem("app_statuses") || "{}");
         
         rawApplications = data.map(app => ({
           ...app,
-          status: normalizeStatus(app.status || localStatuses[app.id])
+          status: normalizeStatus(app.status)
         }));
 
         if (currentUser.role === "all") {
@@ -711,26 +698,24 @@
       if (item) {
         item.status = normalized;
 
-        const localStatuses = JSON.parse(localStorage.getItem("app_statuses") || "{}");
-        localStatuses[id] = normalized;
-        localStorage.setItem("app_statuses", JSON.stringify(localStatuses));
-
         try {
-          await fetch(`/api/admin/applications/${id}/status`, {
+          const res = await fetch(`/api/admin/applications/${id}/status`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status: normalized })
           });
-        } catch (e) {
-          console.log("تم الحفظ في المتصفح");
-        }
-        
-        selectElem.className = `status-select status-${getStatusClass(normalized)}`;
-        updateStats();
 
-        const currentFilter = document.getElementById("statusFilter").value.trim();
-        if (currentFilter) {
-          filterData();
+          if (!res.ok) throw new Error("فشل الحفظ");
+
+          selectElem.className = `status-select status-${getStatusClass(normalized)}`;
+          updateStats();
+
+          const currentFilter = document.getElementById("statusFilter").value.trim();
+          if (currentFilter) {
+            filterData();
+          }
+        } catch (e) {
+          alert("حدث خطأ أثناء حفظ الحالة في قاعدة البيانات.");
         }
       }
     }
