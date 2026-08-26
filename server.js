@@ -325,9 +325,24 @@ app.delete("/api/admin/applications/:id", authenticateAdmin, async (req, res) =>
   }
 });
 
-// 6. تحميل الملفات بروابط مؤقتة
-app.get("/api/uploads/:filename", authenticateAdmin, async (req, res) => {
+// 6. تحميل الملفات بروابط مؤقتة وآمنة (يدعم الهيدر والرابط المباشر)
+app.get("/api/uploads/:filename", async (req, res) => {
   try {
+    const authHeader = req.headers.authorization;
+    const token = (authHeader && authHeader.startsWith("Bearer ")) 
+      ? authHeader.split(" ")[1] 
+      : req.query.token;
+
+    if (!token) {
+      return res.status(401).json({ success: false, message: "غير مصرح: يرجى تسجيل الدخول" });
+    }
+
+    try {
+      jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      return res.status(403).json({ success: false, message: "جلسة الدخول منتهية أو غير صالحة" });
+    }
+
     const { filename } = req.params;
     
     const { data, error } = await supabase.storage
