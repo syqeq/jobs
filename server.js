@@ -151,6 +151,7 @@ async function uploadToSupabase(file) {
   return filename;
 }
 
+// 1. استقبال الطلبات
 app.post("/api/applications", submitLimiter, (req, res) => {
   upload(req, res, async (err) => {
     if (err) return res.status(400).json({ message: err.message });
@@ -215,6 +216,7 @@ app.post("/api/applications", submitLimiter, (req, res) => {
   });
 });
 
+// 2. تسجيل الدخول
 app.post("/api/admin/login", loginLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -255,6 +257,7 @@ app.post("/api/admin/login", loginLimiter, async (req, res) => {
   }
 });
 
+// 3. جلب الطلبات
 app.get("/api/admin/applications", authenticateAdmin, async (req, res) => {
   try {
     const userRole = req.admin.role;
@@ -278,6 +281,7 @@ app.get("/api/admin/applications", authenticateAdmin, async (req, res) => {
   }
 });
 
+// 4. تحديث حالة الطلب
 app.patch("/api/admin/applications/:id/status", authenticateAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -302,6 +306,7 @@ app.patch("/api/admin/applications/:id/status", authenticateAdmin, async (req, r
   }
 });
 
+// 5. حذف الطلب
 app.delete("/api/admin/applications/:id", authenticateAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -320,6 +325,7 @@ app.delete("/api/admin/applications/:id", authenticateAdmin, async (req, res) =>
   }
 });
 
+// 6. تحميل الملفات بروابط مؤقتة
 app.get("/api/uploads/:filename", authenticateAdmin, async (req, res) => {
   try {
     const { filename } = req.params;
@@ -337,6 +343,15 @@ app.get("/api/uploads/:filename", authenticateAdmin, async (req, res) => {
     console.error(err);
     res.status(500).send("حدث خطأ أثناء جلب الملف.");
   }
+});
+
+// 7. توجيه الصفحات الثابتة لضمان عمل الموقع
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
 if (!process.env.VERCEL) {
