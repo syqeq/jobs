@@ -5,6 +5,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSpinner = document.getElementById("btnSpinner");
   const messageBox = document.getElementById("messageBox");
 
+  const defaultLabels = {
+    idFile: "اختر ملف الهوية...",
+    cvFile: "اختر ملف السيرة الذاتية...",
+    qualificationFile: "اختر وثيقة المؤهل...",
+    experienceFile: "اختر ملف الشهادة..."
+  };
+
   const fileInputs = document.querySelectorAll('input[type="file"]');
   fileInputs.forEach(input => {
     input.addEventListener("change", (e) => {
@@ -44,10 +51,22 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       hideMessage();
 
+      const job = form.job?.value?.trim() || "";
+      const trainingCourse = form.trainingCourse?.value?.trim() || "";
       const idNumber = form.idNumber?.value?.trim() || "";
       const phone = form.phone?.value?.trim() || "";
       const email = form.email?.value?.trim() || "";
       const idFile = form.idFile?.files?.[0];
+
+      if (!job) {
+        showMessage("يرجى تحديد المسار المطلوب.", true);
+        return;
+      }
+
+      if (!trainingCourse) {
+        showMessage("يرجى تحديد المسار التدريبي المجتاز.", true);
+        return;
+      }
 
       if (!/^\d{10}$/.test(idNumber)) {
         showMessage("رقم الهوية / الإقامة يجب أن يتكون من 10 أرقام.", true);
@@ -91,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fileInputs.forEach(input => {
           const label = input.nextElementSibling;
           if (label) {
-            label.textContent = "اختر ملفاً...";
+            label.textContent = defaultLabels[input.id] || "اختر ملفاً...";
             label.style.borderColor = "";
             label.style.color = "";
           }
