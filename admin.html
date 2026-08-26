@@ -36,7 +36,6 @@
       color: var(--text);
     }
 
-  
     #loginOverlay {
       position: fixed;
       inset: 0;
@@ -122,7 +121,6 @@
       display: none;
     }
 
-   
     .container {
       max-width: 1650px;
       margin: 0 auto;
@@ -204,7 +202,6 @@
     .btn-logout { background: #f8fafc; color: var(--text-muted); border: 1px solid var(--border); }
     .btn-logout:hover { background: #fee2e2; color: #dc2626; }
 
-
     .stats-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -254,7 +251,6 @@
     .icon-accepted { background: #dcfce7; color: #16a34a; }
     .icon-rejected { background: #fee2e2; color: #dc2626; }
 
-  
     .controls-bar {
       padding: 16px 30px;
       display: flex;
@@ -303,7 +299,6 @@
       color: #64748b;
     }
 
-  
     .table-container {
       padding: 10px 30px 30px;
       overflow-x: auto;
@@ -413,7 +408,7 @@
 </head>
 <body>
 
-
+  <!-- شاشة الدخول -->
   <div id="loginOverlay">
     <div class="login-card">
       <img src="https://rwdrwcqkpljiopruhjty.supabase.co/storage/v1/object/public/uploads/1787625052832-a49c3d2b-ee78-41b8-a709-e832fb9d310c.jpeg" alt="مجموعة سيرا" class="login-logo" />
@@ -428,7 +423,7 @@
     </div>
   </div>
 
-
+  <!-- لوحة التحكم -->
   <div class="container" id="adminPanel">
     <header class="header">
       <div class="header-brand">
@@ -446,7 +441,7 @@
       </div>
     </header>
 
-   
+    <!-- بطاقات الحالات -->
     <div class="stats-container">
       <div class="stat-card">
         <div class="stat-info">
@@ -485,7 +480,7 @@
       </div>
     </div>
 
-   
+    <!-- شريط البحث والفلترة -->
     <div class="controls-bar">
       <div class="search-box">
         <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم، رقم الهوية، أو الجوال..." oninput="filterData()" />
@@ -516,7 +511,7 @@
       </div>
     </div>
 
-   
+    <!-- الجدول -->
     <div class="table-container">
       <table>
         <thead>
@@ -546,9 +541,21 @@
 
   <script>
     let currentUser = null;
+    let authToken = null;
     let rawApplications = [];
     let accessibleApplications = [];
     let currentFiltered = [];
+
+    // حماية ضد هجمات الـ XSS
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
     const trackConfig = {
       "مسار بطائق نُسك": { shapeClass: "shape-circle", color: "#0c594f", bg: "#e6f4ea", border: "#a7f3d0" },
@@ -576,7 +583,7 @@
       return `
         <span class="track-badge" style="background:${conf.bg}; color:${conf.color}; border-color:${conf.border};">
           <span class="geo-shape ${conf.shapeClass}" style="background-color:${conf.color}; color:${conf.color};"></span>
-          ${name}
+          ${escapeHtml(name)}
         </span>
       `;
     }
@@ -604,7 +611,9 @@
 
         if (res.ok && result.success) {
           currentUser = result.user;
+          authToken = result.token;
           sessionStorage.setItem("admin_auth_user", JSON.stringify(currentUser));
+          sessionStorage.setItem("admin_auth_token", authToken);
           errBox.style.display = "none";
           showAdminPanel();
         } else {
@@ -624,7 +633,7 @@
       const jobFilter = document.getElementById("jobFilter");
       const userBadge = document.getElementById("currentUserBadge");
 
-      userBadge.innerText = `👤 المستخدم: ${currentUser.name}`;
+      userBadge.innerText = `👤 المستخدم: ${escapeHtml(currentUser.name)}`;
 
       if (currentUser.role !== "all") {
         jobFilter.value = currentUser.role;
@@ -638,13 +647,16 @@
 
     function logout() {
       sessionStorage.removeItem("admin_auth_user");
+      sessionStorage.removeItem("admin_auth_token");
       window.location.reload();
     }
 
     window.onload = function() {
-      const saved = sessionStorage.getItem("admin_auth_user");
-      if (saved) {
-        currentUser = JSON.parse(saved);
+      const savedUser = sessionStorage.getItem("admin_auth_user");
+      const savedToken = sessionStorage.getItem("admin_auth_token");
+      if (savedUser && savedToken) {
+        currentUser = JSON.parse(savedUser);
+        authToken = savedToken;
         showAdminPanel();
       }
     };
@@ -653,9 +665,15 @@
       try {
         const res = await fetch("/api/admin/applications", {
           headers: {
-            "x-user-role": currentUser ? currentUser.role : "all"
+            "Authorization": `Bearer ${authToken}`
           }
         });
+        
+        if (res.status === 401 || res.status === 403) {
+          logout();
+          return;
+        }
+
         if (!res.ok) throw new Error("تعذر جلب البيانات");
 
         const data = await res.json();
@@ -701,7 +719,10 @@
         try {
           const res = await fetch(`/api/admin/applications/${id}/status`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${authToken}`
+            },
             body: JSON.stringify({ status: normalized })
           });
 
@@ -771,7 +792,7 @@
         tbody.innerHTML += `
           <tr id="row-${item.id}">
             <td>${index + 1}</td>
-            <td><strong>${item.full_name || "-"}</strong></td>
+            <td><strong>${escapeHtml(item.full_name) || "-"}</strong></td>
             <td>${renderTrackBadge(item.job)}</td>
             <td>
               <select class="status-select ${statusClass}" onchange="updateStatus('${item.id}', this.value, this)">
@@ -781,11 +802,11 @@
                 <option value="مرفوض" ${currentStatus === 'مرفوض' ? 'selected' : ''}>مرفوض</option>
               </select>
             </td>
-            <td><code>${item.id_number || "-"}</code></td>
-            <td>${item.phone || "-"}</td>
-            <td>${item.city || "-"}</td>
-            <td>${item.education || "-"}</td>
-            <td>${item.major || "بدون"}</td>
+            <td><code>${escapeHtml(item.id_number) || "-"}</code></td>
+            <td>${escapeHtml(item.phone) || "-"}</td>
+            <td>${escapeHtml(item.city) || "-"}</td>
+            <td>${escapeHtml(item.education) || "-"}</td>
+            <td>${escapeHtml(item.major) || "بدون"}</td>
             <td>${getLink(item.id_file, "الهوية")}</td>
             <td>${getLink(item.cv_file, "السيرة")}</td>
             <td>${getLink(item.qualification_file, "المؤهل")}</td>
@@ -802,7 +823,12 @@
       if (!confirm("هل أنت متأكد من رغبتك في حذف هذا الطلب نهائياً؟")) return;
 
       try {
-        const res = await fetch(`/api/admin/applications/${id}`, { method: "DELETE" });
+        const res = await fetch(`/api/admin/applications/${id}`, { 
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${authToken}`
+          }
+        });
         if (!res.ok) throw new Error("فشل الحذف");
 
         rawApplications = rawApplications.filter(a => String(a.id) !== String(id));
@@ -867,15 +893,15 @@
         excelContent += `
           <tr>
             <td>${idx + 1}</td>
-            <td style="text-align: right; font-weight: bold;">${r.full_name || '-'}</td>
-            <td>${r.job || '-'}</td>
+            <td style="text-align: right; font-weight: bold;">${escapeHtml(r.full_name) || '-'}</td>
+            <td>${escapeHtml(r.job) || '-'}</td>
             <td>${normalizeStatus(r.status)}</td>
-            <td>${r.id_number || '-'}</td>
-            <td>${r.phone || '-'}</td>
-            <td>${r.email || '-'}</td>
-            <td>${r.city || '-'}</td>
-            <td>${r.education || '-'}</td>
-            <td>${r.major || 'بدون'}</td>
+            <td>${escapeHtml(r.id_number) || '-'}</td>
+            <td>${escapeHtml(r.phone) || '-'}</td>
+            <td>${escapeHtml(r.email) || '-'}</td>
+            <td>${escapeHtml(r.city) || '-'}</td>
+            <td>${escapeHtml(r.education) || '-'}</td>
+            <td>${escapeHtml(r.major) || 'بدون'}</td>
             <td>${r.experience || '0'}</td>
           </tr>
         `;
