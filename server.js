@@ -361,6 +361,11 @@ app.get("/api/uploads/:filename", async (req, res) => {
 });
 
 // 7. توجيه الصفحات الثابتة لضمان عمل الموقع
+// 7. توجيه الصفحات الثابتة لضمان عمل الموقع
+app.get('/logo.jpeg', (req, res) => {
+  res.sendFile(path.join(__dirname, 'logo.jpeg'));
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
