@@ -6,8 +6,8 @@
       "destination": "/server.js"
     },
     {
-      "source": "/(.*)",
-      "destination": "/$1"
+      "source": "/((?!.*\\.).*)",
+      "destination": "/server.js"
     }
   ]
 }
