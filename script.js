@@ -5,28 +5,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSpinner = document.getElementById("btnSpinner");
   const messageBox = document.getElementById("messageBox");
 
-  const defaultLabels = {
-    idFile: "اختر ملف الهوية...",
-    cvFile: "اختر ملف السيرة الذاتية...",
-    qualificationFile: "اختر وثيقة المؤهل...",
-    experienceFile: "اختر ملف الشهادة..."
-  };
-
+  // معالجة اختيار وتغيير أسماء الملفات في الواجهة
   const fileInputs = document.querySelectorAll('input[type="file"]');
-  fileInputs.forEach(input => {
+  fileInputs.forEach((input) => {
     input.addEventListener("change", (e) => {
-      const fileName = e.target.files[0]?.name;
+      const file = e.target.files[0];
       const label = input.nextElementSibling;
-      if (label && fileName) {
-        label.textContent = `تم اختيار: ${fileName}`;
-        label.style.borderColor = "#0c594f";
-        label.style.color = "#0c594f";
+      if (label) {
+        if (file) {
+          label.textContent = `تم اختيار: ${file.name}`;
+          label.style.borderColor = "#0c594f";
+          label.style.color = "#0c594f";
+          label.style.backgroundColor = "#f0fdfa";
+        } else {
+          label.textContent = "اختر ملفاً...";
+          label.style.borderColor = "";
+          label.style.color = "";
+          label.style.backgroundColor = "";
+        }
       }
     });
   });
 
   function showMessage(text, isError = false) {
-    if (!messageBox) return;
+    if (!messageBox) {
+      alert(text);
+      return;
+    }
     messageBox.textContent = text;
     messageBox.className = `alert-box ${isError ? "alert-error" : "alert-success"}`;
     messageBox.style.display = "block";
@@ -51,35 +56,41 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       hideMessage();
 
-      const job = form.job?.value?.trim() || "";
-      const trainingCourse = form.trainingCourse?.value?.trim() || "";
-      const idNumber = form.idNumber?.value?.trim() || "";
-      const phone = form.phone?.value?.trim() || "";
-      const email = form.email?.value?.trim() || "";
-      const idFile = form.idFile?.files?.[0];
+      const job = form.querySelector('[name="job"]')?.value?.trim();
+      const trainingCourse = form.querySelector('[name="trainingCourse"]')?.value?.trim();
+      const fullName = form.querySelector('[name="fullName"]')?.value?.trim();
+      const idNumber = form.querySelector('[name="idNumber"]')?.value?.trim();
+      const phone = form.querySelector('[name="phone"]')?.value?.trim();
+      const email = form.querySelector('[name="email"]')?.value?.trim();
+      const idFile = form.querySelector('[name="idFile"]')?.files?.[0];
 
       if (!job) {
         showMessage("يرجى تحديد المسار المطلوب.", true);
         return;
       }
 
-      if (!trainingCourse) {
-        showMessage("يرجى تحديد المسار التدريبي المجتاز.", true);
+      if (!fullName) {
+        showMessage("يرجى إدخال الاسم الرباعي.", true);
         return;
       }
 
-      if (!/^\d{10}$/.test(idNumber)) {
+      if (!idNumber || !/^\d{10}$/.test(idNumber)) {
         showMessage("رقم الهوية / الإقامة يجب أن يتكون من 10 أرقام.", true);
         return;
       }
 
-      if (!/^05\d{8}$/.test(phone)) {
+      if (!phone || !/^05\d{8}$/.test(phone)) {
         showMessage("رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام.", true);
         return;
       }
 
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showMessage("البريد الإلكتروني المدخل غير صحيح.", true);
+        return;
+      }
+
+      if (!trainingCourse) {
+        showMessage("يرجى اختيار المسار التدريبي المجتاز.", true);
         return;
       }
 
@@ -107,17 +118,24 @@ document.addEventListener("DOMContentLoaded", () => {
         showMessage("تم استلام طلبك وتوثيقه بنجاح! شكراً لتقديمك.", false);
         form.reset();
 
-        fileInputs.forEach(input => {
+        // إعادة ضبط تسميات أزرار رفع الملفات
+        fileInputs.forEach((input) => {
           const label = input.nextElementSibling;
           if (label) {
-            label.textContent = defaultLabels[input.id] || "اختر ملفاً...";
+            if (input.name === "idFile") label.textContent = "اختر ملف الهوية...";
+            else if (input.name === "cvFile") label.textContent = "اختر ملف السيرة الذاتية...";
+            else if (input.name === "qualificationFile") label.textContent = "اختر وثيقة المؤهل...";
+            else if (input.name === "experienceFile") label.textContent = "اختر ملف الشهادة...";
+            else label.textContent = "اختر ملفاً...";
+
             label.style.borderColor = "";
             label.style.color = "";
+            label.style.backgroundColor = "";
           }
         });
 
       } catch (err) {
-        console.error(err);
+        console.error("Submission error:", err);
         showMessage(err.message || "حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.", true);
       } finally {
         setSubmitting(false);
