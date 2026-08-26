@@ -871,6 +871,7 @@
               mso-number-format: "\\@";
             }
             tr:nth-child(even) { background-color: #f9fafb; }
+            a { color: #0c594f; text-decoration: underline; font-weight: bold; }
           </style>
         </head>
         <body>
@@ -880,33 +881,61 @@
                 <th style="width: 50px;">#</th>
                 <th style="width: 220px;">الاسم الرباعي</th>
                 <th style="width: 180px;">المسار المطلوب</th>
+                <th style="width: 200px;">المسار التدريبي المجتاز</th>
                 <th style="width: 130px;">حالة الطلب</th>
                 <th style="width: 150px;">رقم الهوية / الإقامة</th>
                 <th style="width: 140px;">رقم الجوال</th>
                 <th style="width: 200px;">البريد الإلكتروني</th>
                 <th style="width: 130px;">المدينة</th>
+                <th style="width: 100px;">الجنس</th>
+                <th style="width: 120px;">الجنسية</th>
                 <th style="width: 130px;">المؤهل</th>
                 <th style="width: 160px;">التخصص</th>
                 <th style="width: 110px;">سنوات الخبرة</th>
+                <th style="width: 160px;">اللغات</th>
+                <th style="width: 120px;">الهوية</th>
+                <th style="width: 120px;">السيرة الذاتية</th>
+                <th style="width: 120px;">المؤهل</th>
+                <th style="width: 160px;">شهادة قادة الضيافة</th>
+                <th style="width: 140px;">تاريخ التقديم</th>
               </tr>
             </thead>
             <tbody>
       `;
 
       dataToExport.forEach((r, idx) => {
+        const getFileLink = (f, title) => {
+          if (!f) return '<span style="color:#9ca3af;">-</span>';
+          const href = f.startsWith("http") 
+            ? f 
+            : `${window.location.origin}/api/uploads/${encodeURIComponent(f)}?token=${encodeURIComponent(authToken)}`;
+          return `<a href="${href}" target="_blank">${title}</a>`;
+        };
+
+        const formattedDate = r.created_at ? new Date(r.created_at).toLocaleDateString('ar-SA') : '-';
+
         excelContent += `
           <tr>
             <td>${idx + 1}</td>
             <td style="text-align: right; font-weight: bold;">${escapeHtml(r.full_name) || '-'}</td>
             <td>${escapeHtml(r.job) || '-'}</td>
+            <td style="font-weight: 500;">${escapeHtml(r.training_course) || 'لا يوجد'}</td>
             <td>${normalizeStatus(r.status)}</td>
             <td>${escapeHtml(r.id_number) || '-'}</td>
             <td>${escapeHtml(r.phone) || '-'}</td>
             <td>${escapeHtml(r.email) || '-'}</td>
             <td>${escapeHtml(r.city) || '-'}</td>
+            <td>${escapeHtml(r.gender) || '-'}</td>
+            <td>${escapeHtml(r.nationality) || '-'}</td>
             <td>${escapeHtml(r.education) || '-'}</td>
             <td>${escapeHtml(r.major) || 'بدون'}</td>
             <td>${r.experience || '0'}</td>
+            <td>${escapeHtml(r.languages) || 'غير محدد'}</td>
+            <td>${getFileLink(r.id_file, "عرض الهوية")}</td>
+            <td>${getFileLink(r.cv_file, "عرض السيرة")}</td>
+            <td>${getFileLink(r.qualification_file, "عرض المؤهل")}</td>
+            <td>${getFileLink(r.experience_file, "عرض الشهادة")}</td>
+            <td>${formattedDate}</td>
           </tr>
         `;
       });
