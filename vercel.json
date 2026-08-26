@@ -6,7 +6,7 @@
       "destination": "/server.js"
     },
     {
-      "source": "/((?!.*\\.).*)",
+      "source": "/((?!.*\\.(?:js|css|png|jpg|jpeg|svg|ico|json|html)$).*)",
       "destination": "/server.js"
     }
   ]
